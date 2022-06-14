@@ -22,7 +22,8 @@ class KIStateView extends StatefulWidget {
   State<KIStateView> createState() => _KIStateViewState();
 }
 
-class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStateMixin {
+class _KIStateViewState extends State<KIStateView>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
@@ -55,7 +56,8 @@ class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStat
     if (widget.state.isEmpty) {
       nState = widget.states.first;
     } else {
-      nState = widget.states.firstWhere((element) => element.name == widget.state);
+      nState =
+          widget.states.firstWhere((element) => element.name == widget.state);
     }
     return AnimatedContainer(
       alignment: nState.alignment,

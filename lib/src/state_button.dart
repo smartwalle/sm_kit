@@ -41,7 +41,8 @@ class KIStateButton extends StatefulWidget {
   State<KIStateButton> createState() => _KIStateButtonState();
 }
 
-class _KIStateButtonState extends State<KIStateButton> with SingleTickerProviderStateMixin {
+class _KIStateButtonState extends State<KIStateButton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
@@ -77,7 +78,8 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
     if (widget.state.isEmpty) {
       nState = widget.states.first;
     } else {
-      nState = widget.states.firstWhere((element) => element.name == widget.state);
+      nState =
+          widget.states.firstWhere((element) => element.name == widget.state);
     }
     return KIAnimatedButton(
       textStyle: nState.textStyle,
@@ -94,9 +96,15 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
       padding: nState.padding,
       size: nState.size,
       decoration: nState.decoration,
-      onPressed: _controller.status == AnimationStatus.completed ? nState.onPressed : null,
-      onLongPress: _controller.status == AnimationStatus.completed ? nState.onLongPress : null,
-      onHighlightChanged: _controller.status == AnimationStatus.completed ? nState.onHighlightChanged : null,
+      onPressed: _controller.status == AnimationStatus.completed
+          ? nState.onPressed
+          : null,
+      onLongPress: _controller.status == AnimationStatus.completed
+          ? nState.onLongPress
+          : null,
+      onHighlightChanged: _controller.status == AnimationStatus.completed
+          ? nState.onHighlightChanged
+          : null,
       mouseCursor: widget.mouseCursor,
       visualDensity: widget.visualDensity,
       clipBehavior: widget.clipBehavior,
