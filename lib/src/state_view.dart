@@ -11,7 +11,7 @@ class KIStateView extends StatefulWidget {
   }) : super(key: key);
 
   final List<KIViewState> states;
-  final KIViewStateController controller;
+  final KIStateViewController controller;
 
   final Duration duration;
   final Curve curve;
@@ -91,8 +91,8 @@ class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStat
   }
 }
 
-class KIViewStateController {
-  KIViewStateController(String stateName) : _state = ValueNotifier(stateName);
+class KIStateViewController {
+  KIStateViewController(String stateName) : _state = ValueNotifier(stateName);
 
   final ValueNotifier<String> _state;
 

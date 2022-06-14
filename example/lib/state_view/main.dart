@@ -29,7 +29,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  KIViewStateController ctr = KIViewStateController("default");
+  KIStateViewController ctr = KIStateViewController("default");
 
   @override
   Widget build(BuildContext context) {
