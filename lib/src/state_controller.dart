@@ -15,6 +15,7 @@ class KIStateController {
 
   AnimationStatus get animationStatus => _animationStatus;
 
+  @protected
   void updateAnimationStatus(AnimationStatus status) {
     _animationStatus = status;
   }
