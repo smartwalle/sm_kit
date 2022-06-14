@@ -12,7 +12,7 @@ class KIStateButton extends StatefulWidget {
     this.clipBehavior = Clip.none,
     this.focusNode,
     this.autofocus = false,
-    this.materialTapTargetSize = MaterialTapTargetSize.padded,
+    this.materialTapTargetSize,
     this.enableFeedback = true,
     this.curve = Curves.linear,
     this.duration = const Duration(milliseconds: 500),
@@ -29,7 +29,7 @@ class KIStateButton extends StatefulWidget {
   final Clip clipBehavior;
   final FocusNode? focusNode;
   final bool autofocus;
-  final MaterialTapTargetSize materialTapTargetSize;
+  final MaterialTapTargetSize? materialTapTargetSize;
   final bool enableFeedback;
 
   final Duration duration;

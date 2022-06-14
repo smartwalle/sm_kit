@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class KIAnimatedButton extends ImplicitlyAnimatedWidget {
-  const KIAnimatedButton({
+  KIAnimatedButton({
     Key? key,
     required this.onPressed,
     this.onLongPress,
@@ -36,7 +36,7 @@ class KIAnimatedButton extends ImplicitlyAnimatedWidget {
     Curve curve = Curves.linear,
     required Duration duration,
     VoidCallback? onEnd,
-  })  : materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.padded,
+  })  : materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
         assert(elevation >= 0.0),
         assert(focusElevation >= 0.0),
         assert(hoverElevation >= 0.0),
