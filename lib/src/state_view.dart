@@ -5,8 +5,8 @@ class KIStateView extends StatefulWidget {
     Key? key,
     required this.states,
     required this.controller,
-    this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.linear,
+    this.duration = const Duration(milliseconds: 500),
     this.onStateChanged,
   }) : super(key: key);
 
