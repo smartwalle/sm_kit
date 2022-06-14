@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sm_kit/src/state_controller.dart';
 
 class KIStateView extends StatefulWidget {
   const KIStateView({
@@ -11,7 +12,7 @@ class KIStateView extends StatefulWidget {
   }) : super(key: key);
 
   final List<KIViewState> states;
-  final KIStateViewController controller;
+  final KIStateController controller;
 
   final Duration duration;
   final Curve curve;
@@ -32,7 +33,7 @@ class _KIStateViewState extends State<KIStateView>
     _controller = AnimationController(vsync: this, duration: widget.duration);
     _animation = CurvedAnimation(parent: _controller, curve: widget.curve);
     _controller.addStatusListener((status) {
-      widget.controller._animationStatus = status;
+      widget.controller.updateAnimationStatus(status);
     });
     _controller.forward(from: 1);
 
@@ -90,22 +91,6 @@ class _KIStateViewState extends State<KIStateView>
       },
     );
   }
-}
-
-class KIStateViewController {
-  KIStateViewController(String stateName) : _state = ValueNotifier(stateName);
-
-  final ValueNotifier<String> _state;
-
-  ValueNotifier<String> get state => _state;
-
-  String get stateName => _state.value;
-
-  void updateState(String stateName) => _state.value = stateName;
-
-  late AnimationStatus _animationStatus = AnimationStatus.completed;
-
-  AnimationStatus get animationStatus => _animationStatus;
 }
 
 class KIViewState {

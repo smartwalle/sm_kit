@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'State View',
+      title: 'State Button',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -29,12 +29,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  KIStateButtonController ctr = KIStateButtonController("default");
+  KIStateController ctr = KIStateController("default");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("State Button"),
+      ),
       body: Center(
         child: KIStateButton(
           controller: ctr,

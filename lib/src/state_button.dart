@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sm_kit/src/animated_button.dart';
+import 'package:sm_kit/src/state_controller.dart';
 
 class KIStateButton extends StatefulWidget {
   const KIStateButton({
@@ -27,7 +28,7 @@ class KIStateButton extends StatefulWidget {
   final MouseCursor? mouseCursor;
 
   final List<KIButtonState> states;
-  final KIStateButtonController controller;
+  final KIStateController controller;
 
   final ShapeBorder shape = const RoundedRectangleBorder();
   final VisualDensity visualDensity;
@@ -55,7 +56,7 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
     _controller = AnimationController(vsync: this, duration: widget.duration);
     _animation = CurvedAnimation(parent: _controller, curve: widget.curve);
     _controller.addStatusListener((status) {
-      widget.controller._animationStatus = status;
+      widget.controller.updateAnimationStatus(status);
     });
     _controller.forward(from: 1);
 
@@ -121,22 +122,6 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
       },
     );
   }
-}
-
-class KIStateButtonController {
-  KIStateButtonController(String stateName) : _state = ValueNotifier(stateName);
-
-  final ValueNotifier<String> _state;
-
-  ValueNotifier<String> get state => _state;
-
-  String get stateName => _state.value;
-
-  void updateState(String stateName) => _state.value = stateName;
-
-  late AnimationStatus _animationStatus = AnimationStatus.completed;
-
-  AnimationStatus get animationStatus => _animationStatus;
 }
 
 class KIButtonState {

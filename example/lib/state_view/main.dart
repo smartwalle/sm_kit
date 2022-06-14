@@ -29,12 +29,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  KIStateViewController ctr = KIStateViewController("default");
+  KIStateController ctr = KIStateController("default");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("State View"),
+      ),
       body: Center(
         child: GestureDetector(
           onTap: () {
