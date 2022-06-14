@@ -14,7 +14,8 @@ class KIKeepAlive extends StatefulWidget {
   State<KIKeepAlive> createState() => _KIKeepAliveState();
 }
 
-class _KIKeepAliveState extends State<KIKeepAlive> with AutomaticKeepAliveClientMixin {
+class _KIKeepAliveState extends State<KIKeepAlive>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);

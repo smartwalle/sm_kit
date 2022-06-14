@@ -22,7 +22,8 @@ class KIStateView extends StatefulWidget {
   State<KIStateView> createState() => _KIStateViewState();
 }
 
-class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStateMixin {
+class _KIStateViewState extends State<KIStateView>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
