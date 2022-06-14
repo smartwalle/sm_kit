@@ -29,7 +29,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  KIStateController ctr = KIStateController("default");
+  var state = "default";
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
       ),
       body: Center(
         child: KIStateButton(
-          controller: ctr,
+          state: state,
           states: [
             KIButtonState(
               "default",
@@ -54,6 +54,10 @@ class _HomeState extends State<Home> {
                 color: Colors.blue,
                 borderRadius: BorderRadius.all(Radius.circular(50)),
               ),
+              onPressed: () {
+                state = "loading";
+                setState(() {});
+              },
             ),
             KIButtonState(
               "loading",
@@ -71,6 +75,10 @@ class _HomeState extends State<Home> {
                 color: Colors.red,
                 borderRadius: BorderRadius.all(Radius.circular(50)),
               ),
+              onPressed: () {
+                state = "done";
+                setState(() {});
+              },
             ),
             KIButtonState(
               "done",
@@ -88,25 +96,15 @@ class _HomeState extends State<Home> {
                 color: Colors.green,
                 borderRadius: BorderRadius.all(Radius.circular(50)),
               ),
+              onPressed: null,
             ),
           ],
           onStateChanged: (value) {
-            print("state changed: $value");
-
             if (value == "done") {
               Future.delayed(const Duration(seconds: 2), () {
-                ctr.updateState("default");
+                state = "default";
+                setState(() {});
               });
-            }
-          },
-          onPressed: () {
-            if (ctr.animationStatus != AnimationStatus.completed) {
-              return;
-            }
-            if (ctr.stateName == "default") {
-              ctr.updateState("loading");
-            } else if (ctr.stateName == "loading") {
-              ctr.updateState("done");
             }
           },
         ),
