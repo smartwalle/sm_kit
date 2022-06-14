@@ -29,7 +29,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  KIStateController ctr = KIStateController("default");
+  String state = "default";
 
   @override
   Widget build(BuildContext context) {
@@ -40,17 +40,16 @@ class _HomeState extends State<Home> {
       body: Center(
         child: GestureDetector(
           onTap: () {
-            if (ctr.animationStatus != AnimationStatus.completed) {
-              return;
-            }
-            if (ctr.stateName == "default") {
-              ctr.updateState("loading");
-            } else if (ctr.stateName == "loading") {
-              ctr.updateState("done");
+            if (state == "default") {
+              state = "loading";
+              setState(() {});
+            } else if (state == "loading") {
+              state = "done";
+              setState(() {});
             }
           },
           child: KIStateView(
-            controller: ctr,
+            state: state,
             states: const [
               KIViewState(
                 "default",
@@ -107,7 +106,8 @@ class _HomeState extends State<Home> {
 
               if (value == "done") {
                 Future.delayed(const Duration(seconds: 2), () {
-                  ctr.updateState("default");
+                  state = "default";
+                  setState(() {});
                 });
               }
             },

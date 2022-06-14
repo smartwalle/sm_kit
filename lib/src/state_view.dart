@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:sm_kit/src/state_controller.dart';
 
 class KIStateView extends StatefulWidget {
   const KIStateView({
     Key? key,
+    required this.state,
     required this.states,
-    required this.controller,
     this.curve = Curves.linear,
     this.duration = const Duration(milliseconds: 500),
     this.onStateChanged,
   }) : super(key: key);
 
+  final String state;
   final List<KIViewState> states;
-  final KIStateController controller;
 
   final Duration duration;
   final Curve curve;
@@ -23,8 +22,7 @@ class KIStateView extends StatefulWidget {
   State<KIStateView> createState() => _KIStateViewState();
 }
 
-class _KIStateViewState extends State<KIStateView>
-    with SingleTickerProviderStateMixin {
+class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
@@ -32,15 +30,17 @@ class _KIStateViewState extends State<KIStateView>
   void initState() {
     _controller = AnimationController(vsync: this, duration: widget.duration);
     _animation = CurvedAnimation(parent: _controller, curve: widget.curve);
-    _controller.addStatusListener((status) {
-      widget.controller.updateAnimationStatus(status);
-    });
     _controller.forward(from: 1);
-
-    widget.controller.state.addListener(() {
-      _controller.forward(from: 0);
-    });
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(KIStateView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.state != widget.state) {
+      _controller.forward(from: 0);
+    }
   }
 
   @override
@@ -51,44 +51,39 @@ class _KIStateViewState extends State<KIStateView>
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String>(
-      valueListenable: widget.controller.state,
-      builder: (context, value, child) {
-        KIViewState nState;
-        if (value.isEmpty) {
-          nState = widget.states.first;
-        } else {
-          nState = widget.states.firstWhere((element) => element.name == value);
-        }
-        return AnimatedContainer(
-          alignment: nState.alignment,
-          padding: nState.padding,
-          color: nState.decoration == null ? nState.color : null,
-          decoration: nState.decoration,
-          foregroundDecoration: nState.foregroundDecoration,
-          width: nState.size?.width,
-          height: nState.size?.height,
-          constraints: nState.constraints,
-          margin: nState.margin,
-          transform: nState.transform,
-          transformAlignment: nState.transformAlignment,
-          clipBehavior: nState.clipBehavior,
-          curve: widget.curve,
-          duration: widget.duration,
-          onEnd: () {
-            widget.onStateChanged?.call(value);
-          },
-          child: AnimatedDefaultTextStyle(
-            duration: widget.duration,
-            curve: widget.curve,
-            style: nState.textStyle,
-            child: FadeTransition(
-              opacity: _animation,
-              child: nState.child,
-            ),
-          ),
-        );
+    KIViewState nState;
+    if (widget.state.isEmpty) {
+      nState = widget.states.first;
+    } else {
+      nState = widget.states.firstWhere((element) => element.name == widget.state);
+    }
+    return AnimatedContainer(
+      alignment: nState.alignment,
+      padding: nState.padding,
+      color: nState.decoration == null ? nState.color : null,
+      decoration: nState.decoration,
+      foregroundDecoration: nState.foregroundDecoration,
+      width: nState.size?.width,
+      height: nState.size?.height,
+      constraints: nState.constraints,
+      margin: nState.margin,
+      transform: nState.transform,
+      transformAlignment: nState.transformAlignment,
+      clipBehavior: nState.clipBehavior,
+      curve: widget.curve,
+      duration: widget.duration,
+      onEnd: () {
+        widget.onStateChanged?.call(nState.name);
       },
+      child: AnimatedDefaultTextStyle(
+        duration: widget.duration,
+        curve: widget.curve,
+        style: nState.textStyle,
+        child: FadeTransition(
+          opacity: _animation,
+          child: nState.child,
+        ),
+      ),
     );
   }
 }

@@ -30,8 +30,8 @@ class KIStateButton extends StatefulWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final MaterialTapTargetSize materialTapTargetSize;
-
   final bool enableFeedback;
+
   final Duration duration;
   final Curve curve;
 
