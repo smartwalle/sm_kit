@@ -36,7 +36,8 @@ class KIAnimatedButton extends ImplicitlyAnimatedWidget {
     Curve curve = Curves.linear,
     required Duration duration,
     VoidCallback? onEnd,
-  })  : materialTapTargetSize = materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
+  })  : materialTapTargetSize =
+            materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
         assert(elevation >= 0.0),
         assert(focusElevation >= 0.0),
         assert(hoverElevation >= 0.0),
@@ -45,7 +46,8 @@ class KIAnimatedButton extends ImplicitlyAnimatedWidget {
         constraints = (size != null
             ? BoxConstraints(minWidth: size.width, minHeight: size.height)
             : const BoxConstraints(minWidth: 88.0, minHeight: 36.0)),
-        decoration = decoration ?? const BoxDecoration(color: Colors.transparent),
+        decoration =
+            decoration ?? const BoxDecoration(color: Colors.transparent),
         super(key: key, curve: curve, duration: duration, onEnd: onEnd);
 
   final VoidCallback? onPressed;
@@ -81,28 +83,46 @@ class KIAnimatedButton extends ImplicitlyAnimatedWidget {
   bool get enabled => onPressed != null || onLongPress != null;
 
   @override
-  AnimatedWidgetBaseState<KIAnimatedButton> createState() => _KIStateButtonState();
+  AnimatedWidgetBaseState<KIAnimatedButton> createState() =>
+      _KIStateButtonState();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<TextStyle>("textStyle", textStyle, defaultValue: null));
+    properties.add(DiagnosticsProperty<TextStyle>("textStyle", textStyle,
+        defaultValue: null));
 
-    properties.add(DiagnosticsProperty<Color>("fillColor", fillColor, defaultValue: null));
-    properties.add(DiagnosticsProperty<Color>("focusColor", focusColor, defaultValue: null));
-    properties.add(DiagnosticsProperty<Color>("hoverColor", hoverColor, defaultValue: null));
-    properties.add(DiagnosticsProperty<Color>("highlightColor", highlightColor, defaultValue: null));
-    properties.add(DiagnosticsProperty<Color>("splashColor", splashColor, defaultValue: null));
+    properties.add(
+        DiagnosticsProperty<Color>("fillColor", fillColor, defaultValue: null));
+    properties.add(DiagnosticsProperty<Color>("focusColor", focusColor,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<Color>("hoverColor", hoverColor,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<Color>("highlightColor", highlightColor,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<Color>("splashColor", splashColor,
+        defaultValue: null));
 
-    properties.add(DiagnosticsProperty<double>("elevation", elevation, defaultValue: null));
-    properties.add(DiagnosticsProperty<double>("hoverElevation", hoverElevation, defaultValue: null));
-    properties.add(DiagnosticsProperty<double>("focusElevation", focusElevation, defaultValue: null));
-    properties.add(DiagnosticsProperty<double>("highlightElevation", highlightElevation, defaultValue: null));
-    properties.add(DiagnosticsProperty<double>("disabledElevation", disabledElevation, defaultValue: null));
+    properties.add(DiagnosticsProperty<double>("elevation", elevation,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<double>("hoverElevation", hoverElevation,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<double>("focusElevation", focusElevation,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<double>(
+        "highlightElevation", highlightElevation,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<double>(
+        "disabledElevation", disabledElevation,
+        defaultValue: null));
 
-    properties.add(DiagnosticsProperty<EdgeInsetsGeometry>('padding', padding, defaultValue: null));
-    properties.add(DiagnosticsProperty<BoxConstraints>('constraints', constraints, defaultValue: null));
-    properties.add(DiagnosticsProperty<Decoration>('decoration', decoration, defaultValue: null));
+    properties.add(DiagnosticsProperty<EdgeInsetsGeometry>('padding', padding,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<BoxConstraints>(
+        'constraints', constraints,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<Decoration>('decoration', decoration,
+        defaultValue: null));
   }
 }
 
@@ -175,8 +195,8 @@ class _KIStateButtonState extends AnimatedWidgetBaseState<KIAnimatedButton> {
       widget.fillColor,
       (dynamic value) => ColorTween(begin: value as Color),
     ) as ColorTween?;
-    _focusColor =
-        visitor(_focusColor, widget.focusColor, (dynamic value) => ColorTween(begin: value as Color)) as ColorTween?;
+    _focusColor = visitor(_focusColor, widget.focusColor,
+        (dynamic value) => ColorTween(begin: value as Color)) as ColorTween?;
     _hoverColor = visitor(
       _hoverColor,
       widget.hoverColor,
@@ -220,7 +240,8 @@ class _KIStateButtonState extends AnimatedWidgetBaseState<KIAnimatedButton> {
     _padding = visitor(
       _padding,
       widget.padding,
-      (dynamic value) => EdgeInsetsGeometryTween(begin: value as EdgeInsetsGeometry),
+      (dynamic value) =>
+          EdgeInsetsGeometryTween(begin: value as EdgeInsetsGeometry),
     ) as EdgeInsetsGeometryTween?;
     _constraints = visitor(
       _constraints,
@@ -237,22 +258,44 @@ class _KIStateButtonState extends AnimatedWidgetBaseState<KIAnimatedButton> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(DiagnosticsProperty<TextStyleTween>('textStyle', _textStyle, defaultValue: null));
+    description.add(DiagnosticsProperty<TextStyleTween>('textStyle', _textStyle,
+        defaultValue: null));
 
-    description.add(DiagnosticsProperty<ColorTween>('fillColor', _fillColor, defaultValue: null));
-    description.add(DiagnosticsProperty<ColorTween>('focusColor', _focusColor, defaultValue: null));
-    description.add(DiagnosticsProperty<ColorTween>('hoverColor', _hoverColor, defaultValue: null));
-    description.add(DiagnosticsProperty<ColorTween>('highlightColor', _highlightColor, defaultValue: null));
-    description.add(DiagnosticsProperty<ColorTween>('splashColor', _splashColor, defaultValue: null));
+    description.add(DiagnosticsProperty<ColorTween>('fillColor', _fillColor,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<ColorTween>('focusColor', _focusColor,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<ColorTween>('hoverColor', _hoverColor,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<ColorTween>(
+        'highlightColor', _highlightColor,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<ColorTween>('splashColor', _splashColor,
+        defaultValue: null));
 
-    description.add(DiagnosticsProperty<Tween<double>>('elevation', _elevation, defaultValue: null));
-    description.add(DiagnosticsProperty<Tween<double>>('focusElevation', _focusElevation, defaultValue: null));
-    description.add(DiagnosticsProperty<Tween<double>>('hoverElevation', _hoverElevation, defaultValue: null));
-    description.add(DiagnosticsProperty<Tween<double>>('highlightElevation', _highlightElevation, defaultValue: null));
-    description.add(DiagnosticsProperty<Tween<double>>('disabledElevation', _disabledElevation, defaultValue: null));
+    description.add(DiagnosticsProperty<Tween<double>>('elevation', _elevation,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<Tween<double>>(
+        'focusElevation', _focusElevation,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<Tween<double>>(
+        'hoverElevation', _hoverElevation,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<Tween<double>>(
+        'highlightElevation', _highlightElevation,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<Tween<double>>(
+        'disabledElevation', _disabledElevation,
+        defaultValue: null));
 
-    description.add(DiagnosticsProperty<EdgeInsetsGeometryTween>('padding', _padding, defaultValue: null));
-    description.add(DiagnosticsProperty<BoxConstraintsTween>('constraints', _constraints, defaultValue: null));
-    description.add(DiagnosticsProperty<DecorationTween>('decoration', _decoration, defaultValue: null));
+    description.add(DiagnosticsProperty<EdgeInsetsGeometryTween>(
+        'padding', _padding,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<BoxConstraintsTween>(
+        'constraints', _constraints,
+        defaultValue: null));
+    description.add(DiagnosticsProperty<DecorationTween>(
+        'decoration', _decoration,
+        defaultValue: null));
   }
 }
