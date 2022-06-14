@@ -48,9 +48,8 @@ class _HomeState extends State<Home> {
                 textAlign: TextAlign.center,
                 maxLines: 1,
               ),
-              size: const Size(200, 50),
+              // size:  Size(MediaQuery.of(context).size.width, 50),
               textStyle: const TextStyle(color: Colors.white, fontSize: 18),
-
               decoration: const BoxDecoration(
                 color: Colors.blue,
                 borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -91,7 +90,7 @@ class _HomeState extends State<Home> {
                   color: Colors.white,
                 ),
               ),
-              constraints: const BoxConstraints(minWidth: 50, minHeight: 50, maxWidth: 50, maxHeight: 50),
+              size: const Size(50, 50),
               textStyle: const TextStyle(color: Colors.white, fontSize: 18),
               decoration: const BoxDecoration(
                 color: Colors.green,

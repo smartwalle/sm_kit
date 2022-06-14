@@ -22,7 +22,7 @@ class KIAnimatedButton extends ImplicitlyAnimatedWidget {
     this.highlightElevation = 8.0,
     this.disabledElevation = 0.0,
     this.padding = EdgeInsets.zero,
-    this.constraints = const BoxConstraints(minWidth: 88.0, minHeight: 36.0),
+    Size? size,
     Decoration? decoration,
     // 支持动画属性结束
 
@@ -42,6 +42,9 @@ class KIAnimatedButton extends ImplicitlyAnimatedWidget {
         assert(hoverElevation >= 0.0),
         assert(highlightElevation >= 0.0),
         assert(disabledElevation >= 0.0),
+        constraints = (size != null
+            ? BoxConstraints(minWidth: size.width, minHeight: size.height)
+            : const BoxConstraints(minWidth: 88.0, minHeight: 36.0)),
         decoration = decoration ?? const BoxDecoration(color: Colors.transparent),
         super(key: key, curve: curve, duration: duration, onEnd: onEnd);
 

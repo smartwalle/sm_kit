@@ -92,7 +92,7 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
       highlightElevation: nState.highlightElevation,
       disabledElevation: nState.disabledElevation,
       padding: nState.padding,
-      constraints: nState.constraints,
+      size: nState.size,
       decoration: nState.decoration,
       onPressed: _controller.status == AnimationStatus.completed ? nState.onPressed : null,
       onLongPress: _controller.status == AnimationStatus.completed ? nState.onLongPress : null,
@@ -136,11 +136,9 @@ class KIButtonState {
     this.highlightElevation = 8.0,
     this.disabledElevation = 0.0,
     this.padding = EdgeInsets.zero,
-    Size? size,
-    BoxConstraints? constraints,
+    this.size,
     this.decoration,
-  }) : constraints = constraints ??
-            (size != null ? BoxConstraints.tight(size) : const BoxConstraints(minWidth: 88.0, minHeight: 36.0));
+  });
 
   final String name;
 
@@ -174,7 +172,7 @@ class KIButtonState {
 
   final EdgeInsetsGeometry padding;
 
-  final BoxConstraints constraints;
+  final Size? size;
 
   final Decoration? decoration;
 
