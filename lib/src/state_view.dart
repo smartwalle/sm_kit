@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:sm_kit/src/state_delegate.dart';
 
 class KIStateView extends StatefulWidget {
-  const KIStateView({
+  KIStateView({
     Key? key,
     required this.state,
-    required this.states,
+    required List<KIViewState> states,
     this.curve = Curves.linear,
     this.duration = const Duration(milliseconds: 500),
     this.onStateChanged,
-  }) : super(key: key);
+  })  : delegate = KIStateListDelegate(states),
+        super(key: key);
+
+  KIStateView.builder({
+    Key? key,
+    required this.state,
+    required KIStateBuilder<KIViewState> stateBuilder,
+    this.curve = Curves.linear,
+    this.duration = const Duration(milliseconds: 500),
+    this.onStateChanged,
+  })  : delegate = KIStateBuilderDelegate(stateBuilder),
+        super(key: key);
 
   final String state;
-  final List<KIViewState> states;
+  final KIStateDelegate<KIViewState> delegate;
 
   final Duration duration;
   final Curve curve;
@@ -22,8 +34,7 @@ class KIStateView extends StatefulWidget {
   State<KIStateView> createState() => _KIStateViewState();
 }
 
-class _KIStateViewState extends State<KIStateView>
-    with SingleTickerProviderStateMixin {
+class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
@@ -52,13 +63,7 @@ class _KIStateViewState extends State<KIStateView>
 
   @override
   Widget build(BuildContext context) {
-    KIViewState nState;
-    if (widget.state.isEmpty) {
-      nState = widget.states.first;
-    } else {
-      nState =
-          widget.states.firstWhere((element) => element.name == widget.state);
-    }
+    KIViewState nState = widget.delegate.build(widget.state);
     return AnimatedContainer(
       alignment: nState.alignment,
       padding: nState.padding,
@@ -135,4 +140,14 @@ class KIViewState {
   final TextStyle textStyle;
 
   final Widget child;
+
+  @override
+  bool operator ==(other) {
+    if (other is KIViewState) {
+      return name == other.name;
+    } else if (other is String) {
+      return name == other;
+    }
+    return false;
+  }
 }

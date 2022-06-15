@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sm_kit/sm_kit.dart';
 import 'package:sm_kit/src/animated_button.dart';
+import 'package:sm_kit/src/state_delegate.dart';
 
 class KIStateButton extends StatefulWidget {
-  const KIStateButton({
+  KIStateButton({
     Key? key,
     required this.state,
-    required this.states,
+    required List<KIButtonState> states,
     this.mouseCursor,
     this.visualDensity = VisualDensity.standard,
     this.clipBehavior = Clip.none,
@@ -17,10 +18,28 @@ class KIStateButton extends StatefulWidget {
     this.curve = Curves.linear,
     this.duration = const Duration(milliseconds: 500),
     this.onStateChanged,
-  }) : super(key: key);
+  })  : delegate = KIStateListDelegate(states),
+        super(key: key);
+
+  KIStateButton.builder({
+    Key? key,
+    required this.state,
+    required KIStateBuilder<KIButtonState> stateBuilder,
+    this.mouseCursor,
+    this.visualDensity = VisualDensity.standard,
+    this.clipBehavior = Clip.none,
+    this.focusNode,
+    this.autofocus = false,
+    this.materialTapTargetSize,
+    this.enableFeedback = true,
+    this.curve = Curves.linear,
+    this.duration = const Duration(milliseconds: 500),
+    this.onStateChanged,
+  })  : delegate = KIStateBuilderDelegate(stateBuilder),
+        super(key: key);
 
   final String state;
-  final List<KIButtonState> states;
+  final KIStateDelegate<KIButtonState> delegate;
 
   final MouseCursor? mouseCursor;
 
@@ -41,8 +60,7 @@ class KIStateButton extends StatefulWidget {
   State<KIStateButton> createState() => _KIStateButtonState();
 }
 
-class _KIStateButtonState extends State<KIStateButton>
-    with SingleTickerProviderStateMixin {
+class _KIStateButtonState extends State<KIStateButton> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
@@ -74,13 +92,7 @@ class _KIStateButtonState extends State<KIStateButton>
 
   @override
   Widget build(BuildContext context) {
-    KIButtonState nState;
-    if (widget.state.isEmpty) {
-      nState = widget.states.first;
-    } else {
-      nState =
-          widget.states.firstWhere((element) => element.name == widget.state);
-    }
+    KIButtonState nState = widget.delegate.build(widget.state);
     return KIAnimatedButton(
       textStyle: nState.textStyle,
       fillColor: nState.fillColor,
@@ -185,4 +197,14 @@ class KIButtonState {
   final Decoration? decoration;
 
   final Widget child;
+
+  @override
+  bool operator ==(other) {
+    if (other is KIButtonState) {
+      return name == other.name;
+    } else if (other is String) {
+      return name == other;
+    }
+    return false;
+  }
 }
