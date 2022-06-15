@@ -1,28 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:sm_kit/sm_kit.dart';
+import 'package:sm_kit/src/state_controller.dart';
 import 'package:sm_kit/src/state_delegate.dart';
 
 class KIStateView extends StatefulWidget {
   KIStateView({
     Key? key,
-    required this.state,
+    this.state,
+    this.controller,
     required List<KIViewState> states,
     this.curve = Curves.linear,
     this.duration = const Duration(milliseconds: 500),
     this.onStateChanged,
-  })  : delegate = KIStateListDelegate(states),
+  })  : assert(state != null || controller != null, '需要设置 state 或者 controller.'),
+        assert(state == null || controller == null, '不能同时设置 state 和 controller.'),
+        delegate = KIStateListDelegate(states),
         super(key: key);
 
   KIStateView.builder({
     Key? key,
-    required this.state,
+    this.state,
+    this.controller,
     required KIStateBuilder<KIViewState> stateBuilder,
     this.curve = Curves.linear,
     this.duration = const Duration(milliseconds: 500),
     this.onStateChanged,
-  })  : delegate = KIStateBuilderDelegate(stateBuilder),
+  })  : assert(state != null || controller != null, '需要设置 state 或者 controller.'),
+        assert(state == null || controller == null, '不能同时设置 state 和 controller.'),
+        delegate = KIStateBuilderDelegate(stateBuilder),
         super(key: key);
 
-  final String state;
+  final String? state;
+  final KIStateController? controller;
+
   final KIStateDelegate<KIViewState> delegate;
 
   final Duration duration;
@@ -38,10 +48,20 @@ class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStat
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
+  late KIStateController? _stateController;
+
+  KIStateController get stateController => widget.controller ?? _stateController!;
+
   @override
   void initState() {
     _controller = AnimationController(vsync: this, duration: widget.duration);
     _animation = CurvedAnimation(parent: _controller, curve: widget.curve);
+
+    if (widget.controller == null) {
+      _stateController = KIStateController(widget.state!);
+    }
+    stateController.addListener(_didStateChanged);
+
     _controller.forward(from: 1);
     super.initState();
   }
@@ -50,20 +70,43 @@ class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStat
   void didUpdateWidget(KIStateView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.state != widget.state) {
-      _controller.forward(from: 0);
+    if (widget.controller == null && oldWidget.controller != null) {
+      oldWidget.controller?.removeListener(_didStateChanged);
+      _stateController = KIStateController(widget.state!);
+      _stateController?.addListener(_didStateChanged);
+    } else if (widget.controller != null && oldWidget.controller == null) {
+      _stateController?.dispose();
+      _stateController = null;
+      widget.controller?.addListener(_didStateChanged);
+    } else if (widget.controller != null && oldWidget.controller != null) {
+      if (widget.controller != oldWidget.controller) {
+        oldWidget.controller?.removeListener(_didStateChanged);
+        widget.controller?.addListener(_didStateChanged);
+      }
+    } else if (widget.controller == null && oldWidget.controller == null) {
+      if (_stateController == null) {
+        _stateController = KIStateController(widget.state!);
+        _stateController?.addListener(_didStateChanged);
+      } else {
+        _stateController?.state = widget.state!;
+      }
     }
+  }
+
+  void _didStateChanged() {
+    _controller.forward(from: 0);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    stateController.removeListener(_didStateChanged);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    KIViewState nState = widget.delegate.build(widget.state);
+    KIViewState nState = widget.delegate.build(stateController.state);
     return AnimatedContainer(
       alignment: nState.alignment,
       padding: nState.padding,
