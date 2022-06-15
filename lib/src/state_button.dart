@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:sm_kit/sm_kit.dart';
 import 'package:sm_kit/src/animated_button.dart';
+import 'package:sm_kit/src/state_controller.dart';
 import 'package:sm_kit/src/state_delegate.dart';
 
 class KIStateButton extends StatefulWidget {
   KIStateButton({
     Key? key,
-    required this.state,
+    this.state,
+    this.controller,
     required List<KIButtonState> states,
     this.mouseCursor,
     this.visualDensity = VisualDensity.standard,
@@ -18,12 +19,15 @@ class KIStateButton extends StatefulWidget {
     this.curve = Curves.linear,
     this.duration = const Duration(milliseconds: 500),
     this.onStateChanged,
-  })  : delegate = KIStateListDelegate(states),
+  })  : assert(state != null || controller != null, '需要设置 state 或者 controller.'),
+        assert(state == null || controller == null, '不能同时设置 state 和 controller.'),
+        delegate = KIStateListDelegate(states),
         super(key: key);
 
   KIStateButton.builder({
     Key? key,
-    required this.state,
+    this.state,
+    this.controller,
     required KIStateBuilder<KIButtonState> stateBuilder,
     this.mouseCursor,
     this.visualDensity = VisualDensity.standard,
@@ -35,10 +39,14 @@ class KIStateButton extends StatefulWidget {
     this.curve = Curves.linear,
     this.duration = const Duration(milliseconds: 500),
     this.onStateChanged,
-  })  : delegate = KIStateBuilderDelegate(stateBuilder),
+  })  : assert(state != null || controller != null, '需要设置 state 或者 controller.'),
+        assert(state == null || controller == null, '不能同时设置 state 和 controller.'),
+        delegate = KIStateBuilderDelegate(stateBuilder),
         super(key: key);
 
-  final String state;
+  final String? state;
+  final KIStateController? controller;
+
   final KIStateDelegate<KIButtonState> delegate;
 
   final MouseCursor? mouseCursor;
@@ -64,6 +72,10 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
+  late KIStateController? _stateController;
+
+  KIStateController get stateController => widget.controller ?? _stateController!;
+
   @override
   void initState() {
     _controller = AnimationController(vsync: this, duration: widget.duration);
@@ -71,6 +83,12 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
     _controller.addStatusListener((status) {
       setState(() {});
     });
+
+    if (widget.controller == null) {
+      _stateController = KIStateController(widget.state!);
+    }
+    stateController.addListener(_didStateChanged);
+
     _controller.forward(from: 1);
     super.initState();
   }
@@ -79,20 +97,43 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
   void didUpdateWidget(KIStateButton oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.state != widget.state) {
-      _controller.forward(from: 0);
+    if (widget.controller == null && oldWidget.controller != null) {
+      oldWidget.controller?.removeListener(_didStateChanged);
+      _stateController = KIStateController(widget.state!);
+      _stateController?.addListener(_didStateChanged);
+    } else if (widget.controller != null && oldWidget.controller == null) {
+      _stateController?.dispose();
+      _stateController = null;
+      widget.controller?.addListener(_didStateChanged);
+    } else if (widget.controller != null && oldWidget.controller != null) {
+      if (widget.controller != oldWidget.controller) {
+        oldWidget.controller?.removeListener(_didStateChanged);
+        widget.controller?.addListener(_didStateChanged);
+      }
+    } else if (widget.controller == null && oldWidget.controller == null) {
+      if (_stateController == null) {
+        _stateController = KIStateController(widget.state!);
+        _stateController?.addListener(_didStateChanged);
+      } else {
+        _stateController?.state = widget.state!;
+      }
     }
+  }
+
+  void _didStateChanged() {
+    _controller.forward(from: 0);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    stateController.removeListener(_didStateChanged);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    KIButtonState nState = widget.delegate.build(widget.state);
+    KIButtonState nState = widget.delegate.build(stateController.state);
     return KIAnimatedButton(
       textStyle: nState.textStyle,
       fillColor: nState.fillColor,
@@ -108,15 +149,9 @@ class _KIStateButtonState extends State<KIStateButton> with SingleTickerProvider
       padding: nState.padding,
       size: nState.size,
       decoration: nState.decoration,
-      onPressed: _controller.status == AnimationStatus.completed
-          ? nState.onPressed
-          : null,
-      onLongPress: _controller.status == AnimationStatus.completed
-          ? nState.onLongPress
-          : null,
-      onHighlightChanged: _controller.status == AnimationStatus.completed
-          ? nState.onHighlightChanged
-          : null,
+      onPressed: _controller.status == AnimationStatus.completed ? nState.onPressed : null,
+      onLongPress: _controller.status == AnimationStatus.completed ? nState.onLongPress : null,
+      onHighlightChanged: _controller.status == AnimationStatus.completed ? nState.onHighlightChanged : null,
       mouseCursor: widget.mouseCursor,
       visualDensity: widget.visualDensity,
       clipBehavior: widget.clipBehavior,

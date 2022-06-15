@@ -29,10 +29,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var buttonState = "default";
+  var ctr1 = KIStateController("default");
+  var ctr2 = KIStateController("default");
 
   @override
   Widget build(BuildContext context) {
+    print("build.....1");
     return Scaffold(
       appBar: AppBar(
         title: const Text("State Button"),
@@ -42,7 +44,7 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             KIStateButton(
-              state: buttonState,
+              controller: ctr1,
               states: [
                 KIButtonState(
                   "default",
@@ -61,8 +63,7 @@ class _HomeState extends State<Home> {
                   highlightColor: Colors.transparent,
                   hoverColor: Colors.transparent,
                   onPressed: () {
-                    buttonState = "loading";
-                    setState(() {});
+                    ctr1.state = "loading";
                   },
                 ),
                 KIButtonState(
@@ -85,8 +86,7 @@ class _HomeState extends State<Home> {
                   highlightColor: Colors.transparent,
                   hoverColor: Colors.transparent,
                   onPressed: () {
-                    buttonState = "done";
-                    setState(() {});
+                    ctr1.state = "done";
                   },
                 ),
                 KIButtonState(
@@ -114,14 +114,13 @@ class _HomeState extends State<Home> {
               onStateChanged: (value) {
                 if (value == "done") {
                   Future.delayed(const Duration(seconds: 2), () {
-                    buttonState = "default";
-                    setState(() {});
+                    ctr1.state = "default";
                   });
                 }
               },
             ),
             KIStateButton.builder(
-              state: buttonState,
+              controller: ctr2,
               stateBuilder: (nState) {
                 switch (nState) {
                   case "loading":
@@ -146,8 +145,7 @@ class _HomeState extends State<Home> {
                         highlightColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         onPressed: () {
-                          buttonState = "done";
-                          setState(() {});
+                          ctr2.state = "done";
                         },
                       );
                     }
@@ -194,11 +192,17 @@ class _HomeState extends State<Home> {
                         highlightColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         onPressed: () {
-                          buttonState = "loading";
-                          setState(() {});
+                          ctr2.state = "loading";
                         },
                       );
                     }
+                }
+              },
+              onStateChanged: (value) {
+                if (value == "done") {
+                  Future.delayed(const Duration(seconds: 2), () {
+                    ctr2.state = "default";
+                  });
                 }
               },
             ),
