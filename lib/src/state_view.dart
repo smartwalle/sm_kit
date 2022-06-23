@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sm_kit/sm_kit.dart';
 import 'package:sm_kit/src/state_controller.dart';
 import 'package:sm_kit/src/state_delegate.dart';
 
