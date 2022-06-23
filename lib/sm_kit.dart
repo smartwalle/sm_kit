@@ -6,3 +6,4 @@ export 'src/state_delegate.dart';
 export 'src/state_controller.dart';
 export 'src/state_view.dart';
 export 'src/state_button.dart';
+export 'src/swipe_view.dart';
