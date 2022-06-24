@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
               foreground: (ctr) {
                 return Container(
                   width: double.infinity,
-                  height: 200,
+                  height: 100,
                   color: Colors.redAccent,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,10 +72,11 @@ class _HomeState extends State<Home> {
               background: (ctr) {
                 return Container(
                   width: double.infinity,
-                  height: 200,
+                  height: 300,
                   color: Colors.greenAccent,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
                         onPressed: () {

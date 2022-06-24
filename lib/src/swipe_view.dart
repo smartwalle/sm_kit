@@ -120,10 +120,17 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
 
   @override
   Widget build(BuildContext context) {
+    var left = widget.direction == KISwipeDirection.ltr ? 0.0 : widget.width - backgroundWidth;
+    var right = widget.direction == KISwipeDirection.rtl ? 0.0 : widget.width - backgroundWidth;
+
     return Stack(
       alignment: Alignment.centerLeft,
       children: [
-        widget.background(this),
+        Positioned.fill(
+          left: left,
+          right: right,
+          child: widget.background(this),
+        ),
         GestureDetector(
           onHorizontalDragUpdate: (details) {
             final primaryDelta = (details.primaryDelta ?? 0) * direction;
