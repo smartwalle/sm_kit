@@ -39,6 +39,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Map<int, KISwipeViewController> ctrs = <int, KISwipeViewController>{};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,6 +52,21 @@ class _HomeState extends State<Home> {
           itemCount: 100,
           itemBuilder: (ctx, index) {
             return KISwipeView(
+              onDragStart: (ctr) {
+                ctrs.forEach((key, value) {
+                  value.close();
+                });
+              },
+              onStatusChanged: (ctr) {
+                if (ctr.status == KISwipeViewStatus.completed) {
+                  ctrs.forEach((key, value) {
+                    value.close();
+                  });
+                  ctrs[index] = ctr;
+                } else if (ctr.status == KISwipeViewStatus.dismissed) {
+                  ctrs.remove(index);
+                }
+              },
               backgroundRatio: 0.3,
               direction: KISwipeDirection.ltr,
               foreground: (ctr, animation) {

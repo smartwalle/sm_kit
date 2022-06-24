@@ -8,14 +8,11 @@ enum KISwipeDirection {
 
 enum KISwipeViewStatus {
   dismissed,
-  forward,
-  reverse,
   completed,
 }
 
 typedef KISwipeViewBuilder = Widget Function(KISwipeViewController controller, Animation<double> animation);
 typedef KISwipeViewStatusChanged = void Function(KISwipeViewController controller);
-typedef KISwipeViewDragStart = void Function(KISwipeViewController controller);
 
 abstract class KISwipeViewController {
   open();
@@ -47,7 +44,7 @@ class KISwipeView extends StatelessWidget {
   final KISwipeViewBuilder foreground;
   final KISwipeViewBuilder background;
 
-  final KISwipeViewDragStart? onDragStart;
+  final KISwipeViewStatusChanged? onDragStart;
   final KISwipeViewStatusChanged? onStatusChanged;
 
   final KISwipeDirection direction;
@@ -95,7 +92,7 @@ class _KISwipeView extends StatefulWidget {
   final KISwipeViewBuilder foreground;
   final KISwipeViewBuilder background;
 
-  final KISwipeViewDragStart? onDragStart;
+  final KISwipeViewStatusChanged? onDragStart;
   final KISwipeViewStatusChanged? onStatusChanged;
 
   final KISwipeDirection direction;
@@ -125,12 +122,6 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
       switch (status) {
         case AnimationStatus.dismissed:
           _status = KISwipeViewStatus.dismissed;
-          break;
-        case AnimationStatus.forward:
-          _status = KISwipeViewStatus.forward;
-          break;
-        case AnimationStatus.reverse:
-          _status = KISwipeViewStatus.reverse;
           break;
         case AnimationStatus.completed:
           _status = KISwipeViewStatus.completed;
