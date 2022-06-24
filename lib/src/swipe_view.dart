@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:sm_kit/sm_kit.dart';
 
 enum KISwipeDirection {
   ltr,
   rtl,
 }
 
-typedef KISwipeViewBuilder = Widget Function(KISwipeViewController controller);
+enum KISwipeViewStatus {
+  dismissed,
+  forward,
+  reverse,
+  completed,
+}
+
+typedef KISwipeViewBuilder = Widget Function(KISwipeViewController controller, Animation<double> animation);
+typedef KISwipeViewStatusChanged = void Function(KISwipeViewController controller);
+typedef KISwipeViewDragStart = void Function(KISwipeViewController controller);
 
 abstract class KISwipeViewController {
   open();
 
   close();
+
+  KISwipeViewStatus get status;
 }
 
 class KISwipeView extends StatelessWidget {
@@ -18,6 +30,8 @@ class KISwipeView extends StatelessWidget {
     Key? key,
     required this.foreground,
     required this.background,
+    this.onDragStart,
+    this.onStatusChanged,
     this.direction = KISwipeDirection.rtl,
     this.backgroundWidth,
     double? backgroundRatio,
@@ -32,6 +46,9 @@ class KISwipeView extends StatelessWidget {
 
   final KISwipeViewBuilder foreground;
   final KISwipeViewBuilder background;
+
+  final KISwipeViewDragStart? onDragStart;
+  final KISwipeViewStatusChanged? onStatusChanged;
 
   final KISwipeDirection direction;
 
@@ -49,6 +66,8 @@ class KISwipeView extends StatelessWidget {
       return _KISwipeView(
         foreground: foreground,
         background: background,
+        onDragStart: onDragStart,
+        onStatusChanged: onStatusChanged,
         direction: direction,
         width: constraints.biggest.width,
         backgroundWidth: backgroundWidth,
@@ -64,6 +83,8 @@ class _KISwipeView extends StatefulWidget {
     Key? key,
     required this.foreground,
     required this.background,
+    this.onDragStart,
+    this.onStatusChanged,
     required this.direction,
     required this.width,
     this.backgroundRatio,
@@ -73,6 +94,9 @@ class _KISwipeView extends StatefulWidget {
 
   final KISwipeViewBuilder foreground;
   final KISwipeViewBuilder background;
+
+  final KISwipeViewDragStart? onDragStart;
+  final KISwipeViewStatusChanged? onStatusChanged;
 
   final KISwipeDirection direction;
 
@@ -91,10 +115,31 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
   late AnimationController controller;
   late Animation<double> offsetAnimation;
 
+  late KISwipeViewStatus _status;
+
   @override
   void initState() {
     super.initState();
     controller = AnimationController(vsync: this, duration: widget.duration, value: 0);
+    controller.addStatusListener((status) {
+      switch (status) {
+        case AnimationStatus.dismissed:
+          _status = KISwipeViewStatus.dismissed;
+          break;
+        case AnimationStatus.forward:
+          _status = KISwipeViewStatus.forward;
+          break;
+        case AnimationStatus.reverse:
+          _status = KISwipeViewStatus.reverse;
+          break;
+        case AnimationStatus.completed:
+          _status = KISwipeViewStatus.completed;
+          break;
+      }
+
+      widget.onStatusChanged?.call(this);
+    });
+    _status = KISwipeViewStatus.dismissed;
     _rebuildOffsetAnimation();
   }
 
@@ -129,9 +174,12 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
         Positioned.fill(
           left: left,
           right: right,
-          child: widget.background(this),
+          child: widget.background(this, controller),
         ),
         GestureDetector(
+          onHorizontalDragStart: (details) {
+            widget.onDragStart?.call(this);
+          },
           onHorizontalDragUpdate: (details) {
             final primaryDelta = (details.primaryDelta ?? 0) * direction;
             if (primaryDelta > 20) {
@@ -158,9 +206,10 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
             builder: (context, child) {
               return Transform.translate(
                 offset: Offset(offsetAnimation.value * direction, 0),
-                child: widget.foreground(this),
+                child: child,
               );
             },
+            child: widget.foreground(this, controller),
           ),
         ),
       ],
@@ -169,11 +218,18 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
 
   @override
   close() {
-    controller.reverse();
+    if (mounted) {
+      controller.reverse();
+    }
   }
 
   @override
   open() {
-    controller.forward();
+    if (mounted) {
+      controller.forward();
+    }
   }
+
+  @override
+  KISwipeViewStatus get status => _status;
 }

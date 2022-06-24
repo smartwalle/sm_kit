@@ -50,43 +50,58 @@ class _HomeState extends State<Home> {
           itemCount: 100,
           itemBuilder: (ctx, index) {
             return KISwipeView(
-              backgroundRatio: 0.5,
+              backgroundRatio: 0.3,
               direction: KISwipeDirection.ltr,
-              foreground: (ctr) {
-                return Container(
-                  width: double.infinity,
-                  height: 100,
-                  color: Colors.redAccent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          ctr.open();
-                        },
-                        child: Text("open ${index}"),
-                      ),
-                    ],
-                  ),
-                );
+              foreground: (ctr, animation) {
+                var colorAnimation = ColorTween(begin: Colors.red, end: Colors.purple).animate(animation);
+                print("foreground ${index}");
+                return AnimatedBuilder(
+                    animation: animation,
+                    builder: (_, __) {
+                      return Container(
+                        width: double.infinity,
+                        height: 100,
+                        color: colorAnimation.value,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                ctr.open();
+                              },
+                              child: Text("open ${index}"),
+                            ),
+                          ],
+                        ),
+                      );
+                    });
               },
-              background: (ctr) {
-                return Container(
-                  width: double.infinity,
-                  height: 300,
-                  color: Colors.greenAccent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          ctr.close();
-                        },
-                        child: const Text("close"),
+              background: (ctr, animation) {
+                var colorAnimation = ColorTween(begin: Colors.green, end: Colors.yellow).animate(animation);
+
+                print("background ${index}");
+
+                return AnimatedBuilder(
+                  animation: animation,
+                  builder: (BuildContext context, Widget? child) {
+                    return Container(
+                      width: double.infinity,
+                      height: 300,
+                      color: colorAnimation.value,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              ctr.close();
+                            },
+                            child: const Text("close"),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
             );
