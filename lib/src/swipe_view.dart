@@ -124,7 +124,7 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
     var right = widget.direction == KISwipeDirection.rtl ? 0.0 : widget.width - backgroundWidth;
 
     return Stack(
-      alignment: Alignment.centerLeft,
+      alignment: Alignment.center,
       children: [
         Positioned.fill(
           left: left,
@@ -134,6 +134,9 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
         GestureDetector(
           onHorizontalDragUpdate: (details) {
             final primaryDelta = (details.primaryDelta ?? 0) * direction;
+            if (primaryDelta > 20) {
+              return;
+            }
             controller.value += primaryDelta / backgroundWidth;
           },
           onHorizontalDragEnd: (details) {

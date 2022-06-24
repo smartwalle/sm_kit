@@ -50,6 +50,7 @@ class _HomeState extends State<Home> {
           itemCount: 100,
           itemBuilder: (ctx, index) {
             return KISwipeView(
+              backgroundRatio: 0.5,
               direction: KISwipeDirection.ltr,
               foreground: (ctr) {
                 return Container(
