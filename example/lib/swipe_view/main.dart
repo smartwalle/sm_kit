@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sm_kit/sm_kit.dart';
 
@@ -17,8 +18,17 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const Home(),
+      scrollBehavior: AppScrollBehavior(),
     );
   }
+}
+
+class AppScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }
 
 class Home extends StatefulWidget {
@@ -35,14 +45,13 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: const Text("Swipe View"),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            KISwipeView(
+      body: SizedBox(
+        child: ListView.builder(
+          itemCount: 100,
+          itemBuilder: (ctx, index) {
+            return KISwipeView(
               direction: KISwipeDirection.ltr,
-              end: 0.7,
-              front: (ctr) {
+              foreground: (ctr) {
                 return Container(
                   width: double.infinity,
                   height: 200,
@@ -54,13 +63,13 @@ class _HomeState extends State<Home> {
                         onPressed: () {
                           ctr.open();
                         },
-                        child: const Text("open"),
+                        child: Text("open ${index}"),
                       ),
                     ],
                   ),
                 );
               },
-              back: (ctr) {
+              background: (ctr) {
                 return Container(
                   width: double.infinity,
                   height: 200,
@@ -78,47 +87,8 @@ class _HomeState extends State<Home> {
                   ),
                 );
               },
-            ),
-            KISwipeView(
-              direction: KISwipeDirection.rtl,
-              front: (ctr) {
-                return Container(
-                  width: double.infinity,
-                  height: 200,
-                  color: Colors.redAccent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          ctr.open();
-                        },
-                        child: const Text("open"),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              back: (ctr) {
-                return Container(
-                  width: double.infinity,
-                  height: 200,
-                  color: Colors.greenAccent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          ctr.close();
-                        },
-                        child: const Text("close"),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

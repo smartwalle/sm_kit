@@ -136,7 +136,8 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         size: const Size(50, 50),
-                        textStyle: const TextStyle(color: Colors.white, fontSize: 18),
+                        textStyle:
+                            const TextStyle(color: Colors.white, fontSize: 18),
                         decoration: const BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -162,7 +163,8 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         size: const Size(50, 50),
-                        textStyle: const TextStyle(color: Colors.white, fontSize: 18),
+                        textStyle:
+                            const TextStyle(color: Colors.white, fontSize: 18),
                         decoration: const BoxDecoration(
                           color: Colors.green,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -183,7 +185,8 @@ class _HomeState extends State<Home> {
                           maxLines: 1,
                         ),
                         size: const Size(200, 50),
-                        textStyle: const TextStyle(color: Colors.white, fontSize: 18),
+                        textStyle:
+                            const TextStyle(color: Colors.white, fontSize: 18),
                         decoration: const BoxDecoration(
                           color: Colors.blue,
                           borderRadius: BorderRadius.all(Radius.circular(50)),

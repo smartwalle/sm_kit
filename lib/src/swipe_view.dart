@@ -13,45 +13,99 @@ abstract class KISwipeViewController {
   close();
 }
 
-class KISwipeView extends StatefulWidget {
-  const KISwipeView({
+class KISwipeView extends StatelessWidget {
+  KISwipeView({
     Key? key,
-    required this.front,
-    required this.back,
+    required this.foreground,
+    required this.background,
     this.direction = KISwipeDirection.rtl,
-    this.end = 0.3,
+    this.backgroundWidth,
+    double? backgroundRatio,
     this.duration = const Duration(milliseconds: 400),
-  })  : assert(end > 0 && end < 1.0, '参数 end 的取值范围为 (0, 1).'),
-        super(key: key);
+  }) : super(key: key) {
+    assert(backgroundWidth == null || backgroundRatio == null, '不能同时设置 backgroundWidth 和 backgroundRatio.');
+    assert(
+        backgroundRatio == null || backgroundRatio > 0 && backgroundRatio < 1.0, '参数 backgroundRatio 的取值范围为 (0, 1).');
 
-  final KISwipeViewBuilder front;
-  final KISwipeViewBuilder back;
+    this.backgroundRatio = backgroundWidth == null ? (backgroundRatio ?? 0.3) : null;
+  }
+
+  final KISwipeViewBuilder foreground;
+  final KISwipeViewBuilder background;
 
   final KISwipeDirection direction;
 
-  final double end;
+  /// backgroundWidth 和 backgroundRatio 都是用于设置 background 的可视宽度，同时只会有一个值生效
+  /// backgroundWidth 是设置一个精确值
+  /// backgroundRatio 是设置一个比例，background 的可视宽度会根据父 Widget 的实际宽度进行动态调整
+  final double? backgroundWidth;
+  late final double? backgroundRatio;
 
   final Duration duration;
 
   @override
-  State<KISwipeView> createState() => _KISwipeViewState();
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (ctx, constraints) {
+      return _KISwipeView(
+        foreground: foreground,
+        background: background,
+        direction: direction,
+        width: constraints.biggest.width,
+        backgroundWidth: backgroundWidth,
+        backgroundRatio: backgroundRatio,
+        duration: duration,
+      );
+    });
+  }
 }
 
-class _KISwipeViewState extends State<KISwipeView> with SingleTickerProviderStateMixin, KISwipeViewController {
+class _KISwipeView extends StatefulWidget {
+  const _KISwipeView({
+    Key? key,
+    required this.foreground,
+    required this.background,
+    required this.direction,
+    required this.width,
+    this.backgroundRatio,
+    this.backgroundWidth,
+    required this.duration,
+  }) : super(key: key);
+
+  final KISwipeViewBuilder foreground;
+  final KISwipeViewBuilder background;
+
+  final KISwipeDirection direction;
+
+  final double width;
+
+  final double? backgroundWidth;
+  final double? backgroundRatio;
+
+  final Duration duration;
+
+  @override
+  State<_KISwipeView> createState() => _KISwipeViewState();
+}
+
+class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderStateMixin, KISwipeViewController {
   late AnimationController controller;
   late Animation<double> offsetAnimation;
 
   @override
   void initState() {
     super.initState();
-
     controller = AnimationController(vsync: this, duration: widget.duration, value: 0);
+    _rebuildOffsetAnimation();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    offsetAnimation = Tween<double>(begin: 0, end: MediaQuery.of(context).size.width * widget.end).animate(controller);
+  void didUpdateWidget(_KISwipeView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _rebuildOffsetAnimation();
+  }
+
+  void _rebuildOffsetAnimation() {
+    offsetAnimation = Tween<double>(begin: 0, end: backgroundWidth).animate(controller);
   }
 
   @override
@@ -60,21 +114,23 @@ class _KISwipeViewState extends State<KISwipeView> with SingleTickerProviderStat
     super.dispose();
   }
 
-  int get _direction => widget.direction == KISwipeDirection.ltr ? 1 : -1;
+  int get direction => widget.direction == KISwipeDirection.ltr ? 1 : -1;
+
+  double get backgroundWidth => widget.backgroundWidth ?? widget.backgroundRatio! * widget.width;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.centerLeft,
       children: [
-        widget.back(this),
+        widget.background(this),
         GestureDetector(
           onHorizontalDragUpdate: (details) {
-            final primaryDelta = (details.primaryDelta ?? 0) * _direction;
-            controller.value += primaryDelta / (MediaQuery.of(context).size.width * widget.end);
+            final primaryDelta = (details.primaryDelta ?? 0) * direction;
+            controller.value += primaryDelta / backgroundWidth;
           },
           onHorizontalDragEnd: (details) {
-            var primaryVelocity = (details.primaryVelocity ?? 0) * _direction;
+            var primaryVelocity = (details.primaryVelocity ?? 0) * direction;
             if (primaryVelocity > 1500) {
               controller.forward();
             } else if (primaryVelocity < -1500) {
@@ -91,8 +147,8 @@ class _KISwipeViewState extends State<KISwipeView> with SingleTickerProviderStat
             animation: controller,
             builder: (context, child) {
               return Transform.translate(
-                offset: Offset(offsetAnimation.value * _direction, 0),
-                child: widget.front(this),
+                offset: Offset(offsetAnimation.value * direction, 0),
+                child: widget.foreground(this),
               );
             },
           ),
