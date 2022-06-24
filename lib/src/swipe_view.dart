@@ -71,7 +71,7 @@ class _KISwipeViewState extends State<KISwipeView> with SingleTickerProviderStat
         GestureDetector(
           onHorizontalDragUpdate: (details) {
             final primaryDelta = (details.primaryDelta ?? 0) * _direction;
-            controller.value += primaryDelta / MediaQuery.of(context).size.width * (widget.end * 10);
+            controller.value += primaryDelta / (MediaQuery.of(context).size.width * widget.end);
           },
           onHorizontalDragEnd: (details) {
             var primaryVelocity = (details.primaryVelocity ?? 0) * _direction;
