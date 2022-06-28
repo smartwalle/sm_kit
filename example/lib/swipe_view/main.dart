@@ -70,54 +70,62 @@ class _HomeState extends State<Home> {
                 }
               },
               backgroundRatio: 0.3,
-              direction: KISwipeDirection.ltr,
+              direction: KISwipeDirection.rtl,
               foreground: (ctr, animation) {
                 var colorAnimation = ColorTween(begin: Colors.red, end: Colors.purple).animate(animation);
-                print("foreground ${index}");
+
                 return AnimatedBuilder(
-                    animation: animation,
-                    builder: (_, __) {
-                      return Container(
-                        width: double.infinity,
-                        height: 100,
-                        color: colorAnimation.value,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                ctr.open();
-                              },
-                              child: Text("open ${index}"),
-                            ),
-                          ],
-                        ),
-                      );
-                    });
+                  animation: animation,
+                  builder: (_, __) {
+                    return Container(
+                      width: double.infinity,
+                      height: 100,
+                      color: colorAnimation.value,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              ctr.open();
+                            },
+                            child: Text("open ${index}"),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
               },
               background: (ctr, animation) {
-                var colorAnimation = ColorTween(begin: Colors.green, end: Colors.yellow).animate(animation);
-
-                print("background ${index}");
+                var widthAnimation = Tween<double>(begin: 0, end: ctr.backgroundWidth).animate(animation);
 
                 return AnimatedBuilder(
                   animation: animation,
                   builder: (BuildContext context, Widget? child) {
-                    return Container(
-                      width: double.infinity,
-                      height: 300,
-                      color: colorAnimation.value,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              ctr.close();
-                            },
-                            child: const Text("close"),
-                          ),
-                        ],
+                    return Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        width: widthAnimation.value,
+                        height: 300,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                color: Colors.teal,
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                color: Colors.lightGreen,
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                color: Colors.pinkAccent,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },

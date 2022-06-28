@@ -18,6 +18,8 @@ abstract class KISwipeViewController {
 
   close();
 
+  double get backgroundWidth;
+
   KISwipeViewStatus get status;
 }
 
@@ -151,8 +153,6 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
 
   int get direction => widget.direction == KISwipeDirection.ltr ? 1 : -1;
 
-  double get backgroundWidth => widget.backgroundWidth ?? widget.backgroundRatio! * widget.width;
-
   @override
   Widget build(BuildContext context) {
     var left = widget.direction == KISwipeDirection.ltr ? 0.0 : widget.width - backgroundWidth;
@@ -219,6 +219,9 @@ class _KISwipeViewState extends State<_KISwipeView> with SingleTickerProviderSta
       controller.forward();
     }
   }
+
+  @override
+  double get backgroundWidth => widget.backgroundWidth ?? widget.backgroundRatio! * widget.width;
 
   @override
   KISwipeViewStatus get status => _status;
