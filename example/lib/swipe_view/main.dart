@@ -54,17 +54,19 @@ class _HomeState extends State<Home> {
             return KISwipeView(
               onDragStart: (ctr) {
                 ctrs.forEach((key, value) {
-                  value.close();
+                  if (value != ctr) {
+                    value.close();
+                  }
                 });
               },
               onStatusChanged: (ctr) {
                 if (ctr.status == KISwipeViewStatus.completed) {
                   ctrs.forEach((key, value) {
-                    value.close();
+                    if (value != ctr) {
+                      value.close();
+                    }
                   });
                   ctrs[index] = ctr;
-                } else if (ctr.status == KISwipeViewStatus.dismissed) {
-                  ctrs.remove(index);
                 }
               },
               backgroundRatio: 0.3,

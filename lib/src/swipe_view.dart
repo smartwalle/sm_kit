@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sm_kit/sm_kit.dart';
 
 enum KISwipeDirection {
   ltr,
