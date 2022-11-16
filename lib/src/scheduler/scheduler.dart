@@ -1,0 +1,180 @@
+import 'dart:async';
+import 'dart:collection';
+import 'dart:developer';
+import 'package:collection/collection.dart' show HeapPriorityQueue;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
+
+class KIPriorityScheduler extends _KIScheduler {
+  KIPriorityScheduler._() : super(_PriorityQueue<_TaskEntry<dynamic>>(_taskSorter));
+
+  static KIPriorityScheduler? _instance;
+
+  static KIPriorityScheduler get instance {
+    _instance ??= KIPriorityScheduler._();
+    return _instance!;
+  }
+
+  static int _taskSorter(_TaskEntry<dynamic> e1, _TaskEntry<dynamic> e2) {
+    return -e1.priority.compareTo(e2.priority);
+  }
+
+  Future<T> scheduleTask<T>(TaskCallback<T> task, int priority, ValueGetter<bool> runnable,
+      {String? debugLabel, Flow? flow}) {
+    return _scheduleTask<T>(task, priority, runnable, debugLabel: debugLabel, flow: flow);
+  }
+}
+
+class KIScheduler extends _KIScheduler {
+  KIScheduler._() : super(_ListQueue<_TaskEntry<dynamic>>());
+
+  static KIScheduler? _instance;
+
+  static KIScheduler get instance {
+    _instance ??= KIScheduler._();
+    return _instance!;
+  }
+
+  Future<T> scheduleTask<T>(TaskCallback<T> task, ValueGetter<bool> runnable, {String? debugLabel, Flow? flow}) {
+    return _scheduleTask<T>(task, 0, runnable, debugLabel: debugLabel, flow: flow);
+  }
+}
+
+/// This is a fork of flutter/scheduler/binding.dart
+class _KIScheduler {
+  _KIScheduler(this._taskQueue);
+
+  final SchedulingStrategy _schedulingStrategy = defaultSchedulingStrategy;
+
+  final _Queue<_TaskEntry<dynamic>> _taskQueue;
+
+  Future<T> _scheduleTask<T>(TaskCallback<T> task, int priority, ValueGetter<bool> runnable,
+      {String? debugLabel, Flow? flow}) {
+    final bool isFirstTask = _taskQueue.isEmpty;
+    final _TaskEntry<T> entry = _TaskEntry<T>(task, priority, runnable, debugLabel, flow);
+    _taskQueue.add(entry);
+    if (isFirstTask) {
+      _ensureEventLoopCallback();
+    }
+    return entry.completer.future;
+  }
+
+  bool _hasRequestedAnEventLoopCallback = false;
+
+  void _ensureEventLoopCallback() {
+    assert(_taskQueue.isNotEmpty);
+    if (_hasRequestedAnEventLoopCallback) {
+      return;
+    }
+    _hasRequestedAnEventLoopCallback = true;
+    Timer.run(() {
+      _removeInvalidTasks();
+      _runTasks();
+    });
+  }
+
+  void _removeInvalidTasks() {
+    while (_taskQueue.isNotEmpty) {
+      if (_taskQueue.first.runnable()) {
+        break;
+      }
+      _taskQueue.removeFirst();
+    }
+  }
+
+  void _runTasks() async {
+    _hasRequestedAnEventLoopCallback = false;
+    if (_handleEventLoopCallback()) {
+      _ensureEventLoopCallback();
+    }
+  }
+
+  bool _handleEventLoopCallback() {
+    if (_taskQueue.isEmpty) {
+      return false;
+    }
+    final _TaskEntry<dynamic> entry = _taskQueue.first;
+    if (_schedulingStrategy(priority: Priority.animation.value, scheduler: SchedulerBinding.instance)) {
+      try {
+        _taskQueue.removeFirst();
+        entry.run();
+      } catch (exception, exceptionStack) {
+        StackTrace? callbackStack;
+        assert(() {
+          callbackStack = entry.debugStack;
+          return true;
+        }());
+        FlutterError.reportError(FlutterErrorDetails(
+          exception: exception,
+          stack: exceptionStack,
+          library: 'scheduler library',
+          context: ErrorDescription('during a task callback'),
+          informationCollector: (callbackStack == null)
+              ? null
+              : () {
+                  return <DiagnosticsNode>[
+                    DiagnosticsStackTrace(
+                      '\nThis exception was thrown in the context of a scheduler callback. '
+                      'When the scheduler callback was _registered_ (as opposed to when the '
+                      'exception was thrown), this was the stack',
+                      callbackStack,
+                    ),
+                  ];
+                },
+        ));
+      }
+      return _taskQueue.isNotEmpty;
+    }
+    return false;
+  }
+}
+
+class _TaskEntry<T> {
+  _TaskEntry(this.task, this.priority, this.runnable, this.debugLabel, this.flow) {
+    assert(() {
+      debugStack = StackTrace.current;
+      return true;
+    }());
+  }
+
+  final TaskCallback<T> task;
+  final int priority;
+  final ValueGetter<bool> runnable;
+  final String? debugLabel;
+  final Flow? flow;
+
+  late StackTrace debugStack;
+  final Completer<T> completer = Completer<T>();
+
+  void run() {
+    if (!kReleaseMode) {
+      Timeline.timeSync(
+        debugLabel ?? 'Scheduled Task',
+        () {
+          completer.complete(task());
+        },
+        flow: flow != null ? Flow.step(flow!.id) : null,
+      );
+    } else {
+      completer.complete(task());
+    }
+  }
+}
+
+abstract class _Queue<E> {
+  bool get isEmpty;
+
+  bool get isNotEmpty;
+
+  E get first;
+
+  E removeFirst();
+
+  void add(E value);
+}
+
+class _ListQueue<E> extends ListQueue<E> implements _Queue<E> {}
+
+class _PriorityQueue<E> extends HeapPriorityQueue<E> implements _Queue<E> {
+  _PriorityQueue([int Function(E, E)? comparison]) : super(comparison);
+}
