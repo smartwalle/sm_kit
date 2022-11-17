@@ -42,11 +42,11 @@ class KIThread extends _KIThread {
 class _KIThread {
   _KIThread(this._taskQueue);
 
-  static _run(SendPort send) async {
-    var receive = ReceivePort();
-    send.send(receive.sendPort);
+  static _run(SendPort sender) async {
+    var receiver = ReceivePort();
+    sender.send(receiver.sendPort);
 
-    await for (final m in receive) {
+    await for (final m in receiver) {
       if (m is List) {
         var task = m[0];
         var value = m[1];
