@@ -34,6 +34,8 @@ class KIThread extends _KIThread {
     return _instance!;
   }
 
+  static KIPriorityThread get priority => KIPriorityThread.instance;
+
   Future<R> scheduleTask<Q, R>(KIThreadCallback<Q, R> task, Q value, ValueGetter<bool> runnable) {
     return _scheduleTask<Q, R>(task, value, 0, runnable);
   }

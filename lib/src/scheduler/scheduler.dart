@@ -36,6 +36,8 @@ class KIScheduler extends _KIScheduler {
     return _instance!;
   }
 
+  static KIPriorityScheduler get priority => KIPriorityScheduler.instance;
+
   Future<T> scheduleTask<T>(KITaskCallback<T> task, ValueGetter<bool> runnable, {String? debugLabel, Flow? flow}) {
     return _scheduleTask<T>(task, 0, runnable, debugLabel: debugLabel, flow: flow);
   }
