@@ -45,46 +45,93 @@ class _KIThread {
   static _run(SendPort send) async {
     var receive = ReceivePort();
     send.send(receive.sendPort);
-    receive.listen((message) {
-      if (message is List) {
-        var task = message[0];
-        var back = message[2] as SendPort;
-        back.send(task(message[1]));
+
+    await for (final m in receive) {
+      if (m is List) {
+        var task = m[0];
+        var value = m[1];
+        var back = m[2] as SendPort;
+        back.send(task(value));
+      } else if (m == null) {
+        break;
       }
-    });
+    }
+    Isolate.exit();
   }
 
-  SendPort? _sender;
+  int _maxActive = 3;
 
-  Future<SendPort> _lazySender() async {
-    if (_sender == null) {
+  int get maxActive => _maxActive;
+
+  set maxActive(int v) {
+    if (v == _maxActive || v < 0) {
+      return;
+    }
+
+    var remain = v - _maxActive;
+    _maxActive = v;
+
+    if (remain > 0) {
+      // 扩容
+      for (var i = 0; i < remain; i++) {
+        _ensureEventLoopCallback();
+      }
+    } else {
+      // 缩容
+      for (var i = remain; i < 0; i++) {
+        if (_senders.isEmpty) {
+          break;
+        }
+        var first = _senders.removeFirst();
+        _releaseSender(first);
+      }
+    }
+  }
+
+  int _active = 0;
+
+  final KIQueue<SendPort> _senders = KIListQueue<SendPort>();
+
+  Future<SendPort?> _lazySender() async {
+    if (_senders.isNotEmpty) {
+      var first = _senders.removeFirst();
+      return Future.value(first);
+    }
+
+    if (_senders.isEmpty && (_maxActive <= 0 || _maxActive > 0 && _active < _maxActive)) {
+      _active++;
       var receive = ReceivePort();
       await Isolate.spawn(_run, receive.sendPort);
-      _sender = await receive.first;
+      SendPort sender = await receive.first;
+      receive.close();
+      return sender;
     }
-    return Future.value(_sender);
+
+    return Future.value(null);
+  }
+
+  void _releaseSender(SendPort sender) {
+    if (_maxActive > 0 && _active > _maxActive) {
+      _active--;
+      sender.send(null);
+      return;
+    }
+    _senders.add(sender);
   }
 
   final KIQueue<_TaskEntry> _taskQueue;
 
   Future<R> _scheduleTask<Q, R>(KIThreadCallback<Q, R> task, Q value, int priority, ValueGetter<bool> runnable) {
-    final bool isFirstTask = _taskQueue.isEmpty;
     final _TaskEntry<Q, R> entry = _TaskEntry<Q, R>(task, value, priority, runnable);
     _taskQueue.add(entry);
-    if (isFirstTask) {
-      _ensureEventLoopCallback();
-    }
+    _ensureEventLoopCallback();
     return entry.completer.future;
   }
 
-  bool _hasRequestedAnEventLoopCallback = false;
-
   void _ensureEventLoopCallback() {
-    assert(_taskQueue.isNotEmpty);
-    if (_hasRequestedAnEventLoopCallback) {
+    if (_taskQueue.isEmpty) {
       return;
     }
-    _hasRequestedAnEventLoopCallback = true;
     Timer.run(() {
       _removeInvalidTasks();
       _runTasks();
@@ -101,23 +148,25 @@ class _KIThread {
   }
 
   void _runTasks() async {
-    _hasRequestedAnEventLoopCallback = false;
-    if (await _handleEventLoopCallback()) {
-      _ensureEventLoopCallback();
+    var sender = await _lazySender();
+    if (sender != null) {
+      var ok = await _handleEventLoopCallback(sender);
+      _releaseSender(sender);
+      if (ok) {
+        _ensureEventLoopCallback();
+      }
     }
   }
 
-  Future<bool> _handleEventLoopCallback() async {
+  Future<bool> _handleEventLoopCallback(SendPort sender) async {
     if (_taskQueue.isEmpty) {
       return false;
     }
-    final _TaskEntry entry = _taskQueue.first;
+    final _TaskEntry entry = _taskQueue.removeFirst();
 
     final ReceivePort receiver = ReceivePort();
 
     try {
-      _taskQueue.removeFirst();
-      var sender = await _lazySender();
       sender.send([entry.task, entry.value, receiver.sendPort]);
       var result = await receiver.first;
 
