@@ -100,10 +100,10 @@ class _KIThread {
 
     if (_senders.isEmpty && (_maxActive <= 0 || _maxActive > 0 && _active < _maxActive)) {
       _active++;
-      var receive = ReceivePort();
-      await Isolate.spawn(_run, receive.sendPort);
-      SendPort sender = await receive.first;
-      receive.close();
+      var receiver = ReceivePort();
+      await Isolate.spawn(_run, receiver.sendPort);
+      SendPort sender = await receiver.first;
+      receiver.close();
       return sender;
     }
 

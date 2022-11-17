@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:sm_kit/src/queue/queue.dart';
 
+typedef KITaskCallback<T> = T Function();
+
 class KIPriorityScheduler extends _KIScheduler {
   KIPriorityScheduler._() : super(KIPriorityQueue<_TaskEntry<dynamic>>(_taskSorter));
 
@@ -18,7 +20,7 @@ class KIPriorityScheduler extends _KIScheduler {
     return -e1.priority.compareTo(e2.priority);
   }
 
-  Future<T> scheduleTask<T>(TaskCallback<T> task, int priority, ValueGetter<bool> runnable,
+  Future<T> scheduleTask<T>(KITaskCallback<T> task, int priority, ValueGetter<bool> runnable,
       {String? debugLabel, Flow? flow}) {
     return _scheduleTask<T>(task, priority, runnable, debugLabel: debugLabel, flow: flow);
   }
@@ -34,7 +36,7 @@ class KIScheduler extends _KIScheduler {
     return _instance!;
   }
 
-  Future<T> scheduleTask<T>(TaskCallback<T> task, ValueGetter<bool> runnable, {String? debugLabel, Flow? flow}) {
+  Future<T> scheduleTask<T>(KITaskCallback<T> task, ValueGetter<bool> runnable, {String? debugLabel, Flow? flow}) {
     return _scheduleTask<T>(task, 0, runnable, debugLabel: debugLabel, flow: flow);
   }
 }
@@ -47,7 +49,7 @@ class _KIScheduler {
 
   final KIQueue<_TaskEntry<dynamic>> _taskQueue;
 
-  Future<T> _scheduleTask<T>(TaskCallback<T> task, int priority, ValueGetter<bool> runnable,
+  Future<T> _scheduleTask<T>(KITaskCallback<T> task, int priority, ValueGetter<bool> runnable,
       {String? debugLabel, Flow? flow}) {
     final bool isFirstTask = _taskQueue.isEmpty;
     final _TaskEntry<T> entry = _TaskEntry<T>(task, priority, runnable, debugLabel, flow);
@@ -136,7 +138,7 @@ class _TaskEntry<T> {
     }());
   }
 
-  final TaskCallback<T> task;
+  final KITaskCallback<T> task;
   final int priority;
   final ValueGetter<bool> runnable;
   final String? debugLabel;
