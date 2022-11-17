@@ -10,3 +10,4 @@ export 'src/swipe_view.dart';
 export 'src/swipe_controller.dart';
 
 export 'src/scheduler/scheduler.dart';
+export 'src/thread/thread.dart';

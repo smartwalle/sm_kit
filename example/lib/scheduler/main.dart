@@ -40,7 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
       print("添加 $i");
       KIPriorityScheduler.instance.scheduleTask(() {
         print("开始处理 $i");
-        sleep(Duration(seconds: 1));
         setState(() {
           _counter++;
         });

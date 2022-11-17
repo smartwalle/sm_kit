@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:developer';
-import 'package:collection/collection.dart' show HeapPriorityQueue;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:sm_kit/src/queue/queue.dart';
 
 class KIPriorityScheduler extends _KIScheduler {
-  KIPriorityScheduler._() : super(_PriorityQueue<_TaskEntry<dynamic>>(_taskSorter));
+  KIPriorityScheduler._() : super(KIPriorityQueue<_TaskEntry<dynamic>>(_taskSorter));
 
   static KIPriorityScheduler? _instance;
 
@@ -26,7 +25,7 @@ class KIPriorityScheduler extends _KIScheduler {
 }
 
 class KIScheduler extends _KIScheduler {
-  KIScheduler._() : super(_ListQueue<_TaskEntry<dynamic>>());
+  KIScheduler._() : super(KIListQueue<_TaskEntry<dynamic>>());
 
   static KIScheduler? _instance;
 
@@ -46,7 +45,7 @@ class _KIScheduler {
 
   final SchedulingStrategy _schedulingStrategy = defaultSchedulingStrategy;
 
-  final _Queue<_TaskEntry<dynamic>> _taskQueue;
+  final KIQueue<_TaskEntry<dynamic>> _taskQueue;
 
   Future<T> _scheduleTask<T>(TaskCallback<T> task, int priority, ValueGetter<bool> runnable,
       {String? debugLabel, Flow? flow}) {
@@ -159,22 +158,4 @@ class _TaskEntry<T> {
       completer.complete(task());
     }
   }
-}
-
-abstract class _Queue<E> {
-  bool get isEmpty;
-
-  bool get isNotEmpty;
-
-  E get first;
-
-  E removeFirst();
-
-  void add(E value);
-}
-
-class _ListQueue<E> extends ListQueue<E> implements _Queue<E> {}
-
-class _PriorityQueue<E> extends HeapPriorityQueue<E> implements _Queue<E> {
-  _PriorityQueue([int Function(E, E)? comparison]) : super(comparison);
 }
