@@ -53,23 +53,36 @@ class _KIScheduler {
 
   Future<T> _scheduleTask<T>(KITaskCallback<T> task, int priority, ValueGetter<bool> runnable,
       {String? debugLabel, Flow? flow}) {
-    final bool isFirstTask = _taskQueue.isEmpty;
+    // final bool isFirstTask = _taskQueue.isEmpty;
     final _TaskEntry<T> entry = _TaskEntry<T>(task, priority, runnable, debugLabel, flow);
     _taskQueue.add(entry);
-    if (isFirstTask) {
+    // if (isFirstTask) {
+    if (_maxActive > _active) {
       _ensureEventLoopCallback();
     }
     return entry.completer.future;
   }
 
-  bool _hasRequestedAnEventLoopCallback = false;
+  // bool _hasRequestedAnEventLoopCallback = false;
+
+  int _maxActive = 1;
+
+  int get maxActive => _maxActive;
+
+  set maxActive(int v) {
+    _maxActive = v;
+  }
+
+  int _active = 0;
 
   void _ensureEventLoopCallback() {
     assert(_taskQueue.isNotEmpty);
-    if (_hasRequestedAnEventLoopCallback) {
+    // if (_hasRequestedAnEventLoopCallback) {
+    if (_active >= _maxActive) {
       return;
     }
-    _hasRequestedAnEventLoopCallback = true;
+    // _hasRequestedAnEventLoopCallback = true;
+    _active++;
     Timer.run(() {
       _removeInvalidTasks();
       _runTasks();
@@ -86,7 +99,9 @@ class _KIScheduler {
   }
 
   void _runTasks() async {
-    _hasRequestedAnEventLoopCallback = false;
+    // _hasRequestedAnEventLoopCallback = false;
+    _active--;
+    await SchedulerBinding.instance.endOfFrame;
     if (_handleEventLoopCallback()) {
       _ensureEventLoopCallback();
     }
