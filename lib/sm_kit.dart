@@ -8,6 +8,7 @@ export 'src/state_view.dart';
 export 'src/state_button.dart';
 export 'src/swipe_view.dart';
 export 'src/swipe_controller.dart';
+export 'src/size_cache.dart';
 
 export 'src/scheduler/scheduler.dart';
 export 'src/thread/thread.dart';
