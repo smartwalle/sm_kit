@@ -2,6 +2,8 @@ import 'dart:collection';
 import 'package:collection/collection.dart' show HeapPriorityQueue;
 
 abstract class KIQueue<E> {
+  int get length;
+
   bool get isEmpty;
 
   bool get isNotEmpty;

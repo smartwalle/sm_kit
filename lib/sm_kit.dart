@@ -10,5 +10,7 @@ export 'src/swipe_view.dart';
 export 'src/swipe_controller.dart';
 export 'src/size_cache.dart';
 
+export 'src/notification/notification.dart';
+
 export 'src/scheduler/scheduler.dart';
 export 'src/thread/thread.dart';
