@@ -2,8 +2,8 @@ import 'dart:async';
 
 typedef KINotificationListenerCallback<T> = Function(T);
 
-class KINotificationListener<T> {
-  KINotificationListener({
+class KINotificationHandler<T> {
+  KINotificationHandler({
     required this.onNotification,
   });
 
@@ -30,33 +30,33 @@ class KINotificationCenter {
 
   final _streamController = StreamController<dynamic>.broadcast();
 
-  final _listeners = <KINotificationListener, StreamSubscription>{};
+  final _handlers = <KINotificationHandler, StreamSubscription>{};
 
   void dispatch(dynamic notification) async {
     _streamController.add(notification);
   }
 
-  void handle(KINotificationListener listener) {
-    if (_listeners.containsKey(listener)) {
+  void handle(KINotificationHandler handler) {
+    if (_handlers.containsKey(handler)) {
       return;
     }
-    final stream = _streamController.stream.where(listener._match);
-    var subscription = stream.listen(listener._onNotification);
-    _listeners[listener] = subscription;
+    final stream = _streamController.stream.where(handler._match);
+    var subscription = stream.listen(handler._onNotification);
+    _handlers[handler] = subscription;
   }
 
-  void remove(KINotificationListener listener) {
-    if (!_listeners.containsKey(listener)) {
+  void remove(KINotificationHandler handler) {
+    if (!_handlers.containsKey(handler)) {
       return;
     }
-    var subscription = _listeners.remove(listener);
+    var subscription = _handlers.remove(handler);
     subscription?.cancel();
   }
 
   void removeAll() {
-    _listeners.forEach((key, value) {
+    _handlers.forEach((key, value) {
       value.cancel();
     });
-    _listeners.clear();
+    _handlers.clear();
   }
 }

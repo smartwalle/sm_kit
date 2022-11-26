@@ -37,16 +37,16 @@ class MyNotification2 {}
 class MyNotification3 {}
 
 class _MyHomePageState extends State<MyHomePage>{
-  var l1 = KINotificationListener<MyNotification1>(onNotification: (notification) {
-    print("lll1");
+  var h1 = KINotificationHandler<MyNotification1>(onNotification: (notification) {
+    print("handler --- 1");
   });
 
-  var l2 = KINotificationListener<MyNotification2>(onNotification: (notification) {
-    print("lll2");
+  var h2 = KINotificationHandler<MyNotification2>(onNotification: (notification) {
+    print("handler --- 2");
   });
 
-  var l3 = KINotificationListener<MyNotification3>(onNotification: (notification) {
-    print("lll3");
+  var h3 = KINotificationHandler<MyNotification3>(onNotification: (notification) {
+    print("handler --- 3");
   });
 
   @override
@@ -59,13 +59,13 @@ class _MyHomePageState extends State<MyHomePage>{
         children: [
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.handle(l1);
+              KINotificationCenter.instance.handle(h1);
             },
             child: Text("Handle MyNotification1"),
           ),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.remove(l1);
+              KINotificationCenter.instance.remove(h1);
             },
             child: Text("Remove MyNotification1"),
           ),
@@ -78,13 +78,13 @@ class _MyHomePageState extends State<MyHomePage>{
           Divider(),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.handle(l2);
+              KINotificationCenter.instance.handle(h2);
             },
             child: Text("Handle MyNotification2"),
           ),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.remove(l2);
+              KINotificationCenter.instance.remove(h2);
             },
             child: Text("Remove MyNotification2"),
           ),
@@ -97,13 +97,13 @@ class _MyHomePageState extends State<MyHomePage>{
           Divider(),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.handle(l3);
+              KINotificationCenter.instance.handle(h3);
             },
             child: Text("Handle MyNotification3"),
           ),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.remove(l3);
+              KINotificationCenter.instance.remove(h3);
             },
             child: Text("Remove MyNotification3"),
           ),
