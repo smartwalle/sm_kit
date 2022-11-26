@@ -30,14 +30,14 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class MyNotification extends KINotification {}
+class MyNotification1 {}
 
-class MyNotification2 extends KINotification {}
+class MyNotification2 {}
 
-class MyNotification3 extends KINotification {}
+class MyNotification3 {}
 
-class _MyHomePageState extends State<MyHomePage> {
-  var l1 = KINotificationListener<MyNotification>(onNotification: (notification) {
+class _MyHomePageState extends State<MyHomePage>{
+  var l1 = KINotificationListener<MyNotification1>(onNotification: (notification) {
     print("lll1");
   });
 
@@ -45,32 +45,83 @@ class _MyHomePageState extends State<MyHomePage> {
     print("lll2");
   });
 
-  @override
-  void initState() {
-    super.initState();
-
-    KINotificationCenter.instance.handle(l1);
-    KINotificationCenter.instance.handle(l2);
-  }
-
-  void _incrementCounter() {
-    KINotificationCenter.instance.dispatch(MyNotification());
-    KINotificationCenter.instance.dispatch(MyNotification2());
-    KINotificationCenter.instance.dispatch(MyNotification3());
-  }
+  var l3 = KINotificationListener<MyNotification3>(onNotification: (notification) {
+    print("lll3");
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Scheduler"),
+        title: const Text("Notification"),
       ),
-      body: Center(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: Column(
+        children: [
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.handle(l1);
+            },
+            child: Text("Handle MyNotification1"),
+          ),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.remove(l1);
+            },
+            child: Text("Remove MyNotification1"),
+          ),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.dispatch(MyNotification1());
+            },
+            child: Text("Dispatch MyNotification1"),
+          ),
+          Divider(),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.handle(l2);
+            },
+            child: Text("Handle MyNotification2"),
+          ),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.remove(l2);
+            },
+            child: Text("Remove MyNotification2"),
+          ),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.dispatch(MyNotification2());
+            },
+            child: Text("Dispatch MyNotification2"),
+          ),
+          Divider(),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.handle(l3);
+            },
+            child: Text("Handle MyNotification3"),
+          ),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.remove(l3);
+            },
+            child: Text("Remove MyNotification3"),
+          ),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.dispatch(MyNotification3());
+            },
+            child: Text("Dispatch MyNotification3"),
+          ),
+          Divider(),
+          TextButton(
+            onPressed: () {
+              KINotificationCenter.instance.removeAll();
+            },
+            child: Text("Remove All"),
+          ),
+        ],
+      ),
     );
   }
 }

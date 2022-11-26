@@ -1,19 +1,23 @@
-abstract class KINotification {}
+import 'dart:async';
 
 typedef KINotificationListenerCallback<T> = Function(T);
 
-class KINotificationListener<T extends KINotification> {
+class KINotificationListener<T> {
   KINotificationListener({
     required this.onNotification,
   });
 
-  _onNotification(KINotification notification) {
+  _onNotification(dynamic notification) {
     if (notification is T) {
       onNotification(notification);
     }
   }
 
-  final KINotificationListenerCallback onNotification;
+  bool _match(dynamic notification) {
+    return notification is T;
+  }
+
+  KINotificationListenerCallback<T> onNotification;
 }
 
 class KINotificationCenter {
@@ -24,29 +28,35 @@ class KINotificationCenter {
     return _instance!;
   }
 
-  final _listeners = <KINotificationListener>[];
+  final _streamController = StreamController<dynamic>.broadcast();
 
-  void dispatch(KINotification notification) async {
-    for (var listener in _listeners) {
-      listener._onNotification(notification);
-    }
+  final _listeners = <KINotificationListener, StreamSubscription>{};
+
+  void dispatch(dynamic notification) async {
+    _streamController.add(notification);
   }
 
   void handle(KINotificationListener listener) {
-    if (_listeners.contains(listener)) {
+    if (_listeners.containsKey(listener)) {
       return;
     }
-    _listeners.add(listener);
+    final stream = _streamController.stream.where(listener._match);
+    var subscription = stream.listen(listener._onNotification);
+    _listeners[listener] = subscription;
   }
 
   void remove(KINotificationListener listener) {
-    if (!_listeners.contains(listener)) {
+    if (!_listeners.containsKey(listener)) {
       return;
     }
-    _listeners.remove(listener);
+    var subscription = _listeners.remove(listener);
+    subscription?.cancel();
   }
 
   void removeAll() {
+    _listeners.forEach((key, value) {
+      value.cancel();
+    });
     _listeners.clear();
   }
 }
