@@ -99,9 +99,9 @@ class _KIScheduler {
   }
 
   void _runTasks() async {
+    await SchedulerBinding.instance.endOfFrame;
     // _hasRequestedAnEventLoopCallback = false;
     _active--;
-    await SchedulerBinding.instance.endOfFrame;
     if (_handleEventLoopCallback()) {
       _ensureEventLoopCallback();
     }
