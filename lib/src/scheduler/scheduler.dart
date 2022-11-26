@@ -47,7 +47,7 @@ class KIScheduler extends _KIScheduler {
 class _KIScheduler {
   _KIScheduler(this._taskQueue);
 
-  final SchedulingStrategy _schedulingStrategy = defaultSchedulingStrategy;
+  // final SchedulingStrategy _schedulingStrategy = defaultSchedulingStrategy;
 
   final KIQueue<_TaskEntry<dynamic>> _taskQueue;
 
@@ -112,38 +112,38 @@ class _KIScheduler {
       return false;
     }
     final _TaskEntry<dynamic> entry = _taskQueue.first;
-    if (_schedulingStrategy(priority: Priority.animation.value, scheduler: SchedulerBinding.instance)) {
-      try {
-        _taskQueue.removeFirst();
-        entry.run();
-      } catch (exception, exceptionStack) {
-        StackTrace? callbackStack;
-        assert(() {
-          callbackStack = entry.debugStack;
-          return true;
-        }());
-        FlutterError.reportError(FlutterErrorDetails(
-          exception: exception,
-          stack: exceptionStack,
-          library: 'scheduler library',
-          context: ErrorDescription('during a task callback'),
-          informationCollector: (callbackStack == null)
-              ? null
-              : () {
-                  return <DiagnosticsNode>[
-                    DiagnosticsStackTrace(
-                      '\nThis exception was thrown in the context of a scheduler callback. '
-                      'When the scheduler callback was _registered_ (as opposed to when the '
-                      'exception was thrown), this was the stack',
-                      callbackStack,
-                    ),
-                  ];
-                },
-        ));
-      }
-      return _taskQueue.isNotEmpty;
+    // if (_schedulingStrategy(priority: Priority.animation.value, scheduler: SchedulerBinding.instance)) {
+    try {
+      _taskQueue.removeFirst();
+      entry.run();
+    } catch (exception, exceptionStack) {
+      StackTrace? callbackStack;
+      assert(() {
+        callbackStack = entry.debugStack;
+        return true;
+      }());
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: exception,
+        stack: exceptionStack,
+        library: 'scheduler library',
+        context: ErrorDescription('during a task callback'),
+        informationCollector: (callbackStack == null)
+            ? null
+            : () {
+                return <DiagnosticsNode>[
+                  DiagnosticsStackTrace(
+                    '\nThis exception was thrown in the context of a scheduler callback. '
+                    'When the scheduler callback was _registered_ (as opposed to when the '
+                    'exception was thrown), this was the stack',
+                    callbackStack,
+                  ),
+                ];
+              },
+      ));
     }
-    return false;
+    return _taskQueue.isNotEmpty;
+    // }
+    // return false;
   }
 }
 
