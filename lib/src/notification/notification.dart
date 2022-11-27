@@ -2,11 +2,7 @@ import 'dart:async';
 
 typedef KINotificationListenerCallback<T> = Function(T);
 
-class KINotificationHandler<T> {
-  KINotificationHandler({
-    required this.onNotification,
-  });
-
+mixin KINotificationHandler<T> {
   _onNotification(dynamic notification) {
     if (notification is T) {
       onNotification(notification);
@@ -17,7 +13,36 @@ class KINotificationHandler<T> {
     return notification is T;
   }
 
-  KINotificationListenerCallback<T> onNotification;
+  void onNotification(T notification);
+}
+
+class KINotificationWrapper<T> with KINotificationHandler<T> {
+  KINotificationWrapper({
+    required this.handler,
+  });
+
+  KINotificationListenerCallback<T> handler;
+
+  @override
+  void onNotification(T notification) {
+    handler(notification);
+  }
+}
+
+abstract class KINotificationSubscription {
+  void cancel();
+}
+
+class _KINotificationSubscription implements KINotificationSubscription {
+  _KINotificationSubscription({required this.center, required this.handler});
+
+  final KINotificationCenter center;
+  final KINotificationHandler handler;
+
+  @override
+  void cancel() {
+    center.remove(handler);
+  }
 }
 
 class KINotificationCenter {
@@ -36,13 +61,14 @@ class KINotificationCenter {
     _streamController.add(notification);
   }
 
-  void handle(KINotificationHandler handler) {
+  KINotificationSubscription? handle(KINotificationHandler handler) {
     if (_handlers.containsKey(handler)) {
-      return;
+      return null;
     }
     final stream = _streamController.stream.where(handler._match);
     var subscription = stream.listen(handler._onNotification);
     _handlers[handler] = subscription;
+    return _KINotificationSubscription(center: this, handler: handler);
   }
 
   void remove(KINotificationHandler handler) {

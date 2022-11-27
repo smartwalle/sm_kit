@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:sm_kit/sm_kit.dart';
 
@@ -36,18 +34,15 @@ class MyNotification2 {}
 
 class MyNotification3 {}
 
-class _MyHomePageState extends State<MyHomePage>{
-  var h1 = KINotificationHandler<MyNotification1>(onNotification: (notification) {
-    print("handler --- 1");
-  });
-
-  var h2 = KINotificationHandler<MyNotification2>(onNotification: (notification) {
+class _MyHomePageState extends State<MyHomePage> with KINotificationHandler<MyNotification1> {
+  var h2 = KINotificationWrapper<MyNotification2>(handler: (notification) {
     print("handler --- 2");
   });
 
-  var h3 = KINotificationHandler<MyNotification3>(onNotification: (notification) {
+  var h3 = KINotificationWrapper<MyNotification3>(handler: (notification) {
     print("handler --- 3");
   });
+  KINotificationSubscription? s3;
 
   @override
   Widget build(BuildContext context) {
@@ -59,13 +54,13 @@ class _MyHomePageState extends State<MyHomePage>{
         children: [
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.handle(h1);
+              KINotificationCenter.instance.handle(this);
             },
             child: Text("Handle MyNotification1"),
           ),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.remove(h1);
+              KINotificationCenter.instance.remove(this);
             },
             child: Text("Remove MyNotification1"),
           ),
@@ -97,13 +92,15 @@ class _MyHomePageState extends State<MyHomePage>{
           Divider(),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.handle(h3);
+              s3?.cancel();
+              s3 = KINotificationCenter.instance.handle(h3);
             },
             child: Text("Handle MyNotification3"),
           ),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.remove(h3);
+              s3?.cancel();
+              s3 = null;
             },
             child: Text("Remove MyNotification3"),
           ),
@@ -123,5 +120,10 @@ class _MyHomePageState extends State<MyHomePage>{
         ],
       ),
     );
+  }
+
+  @override
+  void onNotification(MyNotification1 notification) {
+    print("handler --- 1");
   }
 }
