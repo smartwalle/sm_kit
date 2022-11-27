@@ -21,7 +21,7 @@ class KINotificationWrapper<T> with KINotificationHandler<T> {
     required this.handler,
   });
 
-  KINotificationListenerCallback<T> handler;
+  final KINotificationListenerCallback<T> handler;
 
   @override
   void onNotification(T notification) {
