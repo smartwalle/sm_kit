@@ -127,7 +127,7 @@ class _KIStateViewState extends State<KIStateView> with SingleTickerProviderStat
       child: AnimatedDefaultTextStyle(
         duration: widget.duration,
         curve: widget.curve,
-        style: nState.textStyle,
+        style: nState.textStyle ?? DefaultTextStyle.of(context).style,
         child: FadeTransition(
           opacity: _animation,
           child: nState.child,
@@ -151,7 +151,7 @@ class KIStateViewState {
     this.transform,
     this.transformAlignment,
     this.clipBehavior = Clip.none,
-    this.textStyle = const TextStyle(fontSize: 12),
+    this.textStyle,
     required this.child,
   });
 
@@ -179,7 +179,7 @@ class KIStateViewState {
 
   final Clip clipBehavior;
 
-  final TextStyle textStyle;
+  final TextStyle? textStyle;
 
   final Widget child;
 
