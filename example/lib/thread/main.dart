@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Text(
               '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             TextButton(onPressed: _addTask, child: Text("添加任务")),
             TextButton(
