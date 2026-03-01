@@ -34,12 +34,12 @@ class MyNotification2 {}
 
 class MyNotification3 {}
 
-class _MyHomePageState extends State<MyHomePage> with KINotificationHandler<MyNotification1> {
-  var h2 = KINotificationWrapper<MyNotification2>(handler: (notification) {
+class _MyHomePageState extends State<MyHomePage> with KINotificationObserver<MyNotification1> {
+  var h2 = KINotificationHandler<MyNotification2>(handler: (notification) {
     print("handler --- 2");
   });
 
-  var h3 = KINotificationWrapper<MyNotification3>(handler: (notification) {
+  var h3 = KINotificationHandler<MyNotification3>(handler: (notification) {
     print("handler --- 3");
   });
   KINotificationSubscription? s3;
@@ -54,13 +54,13 @@ class _MyHomePageState extends State<MyHomePage> with KINotificationHandler<MyNo
         children: [
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.handle(this);
+              KINotificationCenter.instance.addObserver(this);
             },
             child: Text("Handle MyNotification1"),
           ),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.remove(this);
+              KINotificationCenter.instance.removeObserver(this);
             },
             child: Text("Remove MyNotification1"),
           ),
@@ -73,13 +73,13 @@ class _MyHomePageState extends State<MyHomePage> with KINotificationHandler<MyNo
           Divider(),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.handle(h2);
+              KINotificationCenter.instance.addObserver(h2);
             },
             child: Text("Handle MyNotification2"),
           ),
           TextButton(
             onPressed: () {
-              KINotificationCenter.instance.remove(h2);
+              KINotificationCenter.instance.removeObserver(h2);
             },
             child: Text("Remove MyNotification2"),
           ),
@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> with KINotificationHandler<MyNo
           TextButton(
             onPressed: () {
               s3?.cancel();
-              s3 = KINotificationCenter.instance.handle(h3);
+              s3 = KINotificationCenter.instance.addObserver(h3);
             },
             child: Text("Handle MyNotification3"),
           ),

@@ -1,8 +1,6 @@
 import 'dart:async';
 
-typedef KINotificationListenerCallback<T> = Function(T);
-
-mixin KINotificationHandler<T> {
+mixin KINotificationObserver<T> {
   _onNotification(dynamic notification) {
     if (notification is T) {
       onNotification(notification);
@@ -16,12 +14,12 @@ mixin KINotificationHandler<T> {
   void onNotification(T notification);
 }
 
-class KINotificationWrapper<T> with KINotificationHandler<T> {
-  KINotificationWrapper({
+class KINotificationHandler<T> with KINotificationObserver<T> {
+  KINotificationHandler({
     required this.handler,
   });
 
-  final KINotificationListenerCallback<T> handler;
+  final Function(T) handler;
 
   @override
   void onNotification(T notification) {
@@ -37,11 +35,11 @@ class _KINotificationSubscription implements KINotificationSubscription {
   _KINotificationSubscription({required this.center, required this.handler});
 
   final KINotificationCenter center;
-  final KINotificationHandler handler;
+  final KINotificationObserver handler;
 
   @override
   void cancel() {
-    center.remove(handler);
+    center.removeObserver(handler);
   }
 }
 
@@ -55,34 +53,34 @@ class KINotificationCenter {
 
   final _streamController = StreamController<dynamic>.broadcast();
 
-  final _handlers = <KINotificationHandler, StreamSubscription>{};
+  final _observers = <KINotificationObserver, StreamSubscription>{};
 
   void dispatch(dynamic notification) async {
     _streamController.add(notification);
   }
 
-  KINotificationSubscription? handle(KINotificationHandler handler) {
-    if (_handlers.containsKey(handler)) {
+  KINotificationSubscription? addObserver(KINotificationObserver observer) {
+    if (_observers.containsKey(observer)) {
       return null;
     }
-    final stream = _streamController.stream.where(handler._match);
-    var subscription = stream.listen(handler._onNotification);
-    _handlers[handler] = subscription;
-    return _KINotificationSubscription(center: this, handler: handler);
+    final stream = _streamController.stream.where(observer._match);
+    var subscription = stream.listen(observer._onNotification);
+    _observers[observer] = subscription;
+    return _KINotificationSubscription(center: this, handler: observer);
   }
 
-  void remove(KINotificationHandler handler) {
-    if (!_handlers.containsKey(handler)) {
+  void removeObserver(KINotificationObserver observer) {
+    if (!_observers.containsKey(observer)) {
       return;
     }
-    var subscription = _handlers.remove(handler);
+    var subscription = _observers.remove(observer);
     subscription?.cancel();
   }
 
   void removeAll() {
-    _handlers.forEach((key, value) {
+    _observers.forEach((key, value) {
       value.cancel();
     });
-    _handlers.clear();
+    _observers.clear();
   }
 }
